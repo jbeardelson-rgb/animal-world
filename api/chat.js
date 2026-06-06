@@ -28,6 +28,9 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+    if (!response.ok) {
+      return res.status(500).json({ groqStatus: response.status, groqError: data });
+    }
     const reply = data.choices[0].message.content;
     res.status(200).json({ reply });
 
