@@ -152,19 +152,19 @@ resize();
 // ANIMAL VISUAL DATA
 // ════════════════════════════════════════
 const AD = {
-  // Farm
-  'Cow':         {body:'#f0ede0',accent:'#333',shape:'quad',spots:true},
-  'Pig':         {body:'#ffb3ba',accent:'#ff8fa3',shape:'quad',snout:true},
+  // Farm — each has unique shape
+  'Cow':         {body:'#f0ede0',accent:'#333',shape:'cow'},
+  'Pig':         {body:'#ffb3ba',accent:'#ff8fa3',shape:'pig'},
   'Chicken':     {body:'#f0d060',accent:'#e53935',shape:'bird_walk',comb:true},
-  'Horse':       {body:'#8B4513',accent:'#5d2e0c',shape:'quad',mane:true},
-  'Sheep':       {body:'#e8e8e0',accent:'#999',shape:'quad',fluffy:true},
-  'Goat':        {body:'#d4c5a9',accent:'#8B7355',shape:'quad',horns:true,beard:true},
+  'Horse':       {body:'#8B4513',accent:'#5d2e0c',shape:'horse',mane:true},
+  'Sheep':       {body:'#e8e8e0',accent:'#444',shape:'sheep'},
+  'Goat':        {body:'#d4c5a9',accent:'#8B7355',shape:'goat'},
   'Duck':        {body:'#4a9e6b',accent:'#e67e22',shape:'bird_walk'},
-  'Donkey':      {body:'#9e9e9e',accent:'#616161',shape:'quad',mane:true,ears:'long'},
+  'Donkey':      {body:'#9e9e9e',accent:'#616161',shape:'horse',mane:true,ears:'long'},
   'Rooster':     {body:'#c0392b',accent:'#f39c12',shape:'bird_walk',comb:true},
-  'Rabbit':      {body:'#f0e6d3',accent:'#f4a0a0',shape:'quad',ears:'long'},
-  'Llama':       {body:'#d4c5a9',accent:'#b8a898',shape:'quad',neck:'long'},
-  'Ox':          {body:'#6d3b2b',accent:'#4a2820',shape:'quad',horns:true},
+  'Rabbit':      {body:'#f0e6d3',accent:'#f4a0a0',shape:'rabbit'},
+  'Llama':       {body:'#d4c5a9',accent:'#b8a898',shape:'llama'},
+  'Ox':          {body:'#6d3b2b',accent:'#d4c56a',shape:'cow',ox:true},
   // Ocean
   'Shark':       {body:'#607d8b',belly:'#eceff1',shape:'fish',fin:true},
   'Dolphin':     {body:'#4a90d9',belly:'#e8f4fd',shape:'fish',beak:true},
@@ -179,62 +179,62 @@ const AD = {
   'Blowfish':    {body:'#ffd54f',accent:'#ff8f00',shape:'fish',spiky:true},
   'Tuna':        {body:'#1565c0',belly:'#42a5f5',shape:'fish'},
   // Jungle
-  'Gorilla':     {body:'#424242',accent:'#616161',shape:'quad',big:true,arms:'long'},
-  'Tree Frog':   {body:'#4caf50',accent:'#81c784',shape:'quad'},
-  'Sloth':       {body:'#795548',accent:'#a1887f',shape:'quad'},
+  'Gorilla':     {body:'#424242',accent:'#8d6e63',shape:'gorilla'},
+  'Tree Frog':   {body:'#4caf50',accent:'#c8e6c9',shape:'frog'},
+  'Sloth':       {body:'#795548',accent:'#a1887f',shape:'sloth'},
   'Macaw':       {body:'#2196f3',accent:'#f44336',shape:'bird'},
   'Monkey':      {body:'#8d6e63',accent:'#ffcc80',shape:'monkey'},
   'Butterfly':   {body:'#ff9800',accent:'#e91e63',shape:'butterfly'},
-  'Crocodile':   {body:'#388e3c',belly:'#81c784',shape:'quad',long:true},
-  'Tiger':       {body:'#ff8f00',accent:'#212121',shape:'quad',stripes:true},
+  'Crocodile':   {body:'#388e3c',belly:'#a5d6a7',shape:'croc'},
+  'Tiger':       {body:'#ff8f00',accent:'#212121',shape:'cat',stripes:true},
   'Tarantula':   {body:'#4e342e',accent:'#3e2723',shape:'spider'},
-  'Leopard':     {body:'#f9a825',accent:'#212121',shape:'quad',spots:true},
+  'Leopard':     {body:'#f9a825',accent:'#212121',shape:'cat',spots:true},
   'Anaconda':    {body:'#2e7d32',accent:'#1b5e20',shape:'snake'},
   'Peacock':     {body:'#1a237e',accent:'#00bcd4',shape:'bird_walk',tail:'fan'},
   // Desert
-  'Camel':       {body:'#c49a6c',accent:'#b8860b',shape:'quad',hump:true,neck:'long'},
+  'Camel':       {body:'#c49a6c',accent:'#b8860b',shape:'camel'},
   'Scorpion':    {body:'#ffd700',accent:'#daa520',shape:'spider',tail:'sting'},
-  'Lizard':      {body:'#8bc34a',accent:'#558b2f',shape:'quad',long:true},
+  'Lizard':      {body:'#8bc34a',accent:'#558b2f',shape:'lizard'},
   'Vulture':     {body:'#616161',accent:'#e53935',shape:'bird'},
-  'Fennec Fox':  {body:'#ffcc80',accent:'#ffe0b2',shape:'quad',ears:'huge'},
+  'Fennec Fox':  {body:'#ffcc80',accent:'#ffe0b2',shape:'fox'},
   'Cricket':     {body:'#558b2f',accent:'#33691e',shape:'insect'},
   'Ant':         {body:'#212121',accent:'#424242',shape:'insect'},
-  'Hedgehog':    {body:'#795548',accent:'#4e342e',shape:'quad',spiky:true},
-  'Honey Badger':{body:'#bdbdbd',accent:'#212121',shape:'quad'},
-  'Dingo':       {body:'#d4a256',accent:'#b8860b',shape:'quad',ears:'pointed'},
+  'Hedgehog':    {body:'#795548',accent:'#4e342e',shape:'hedgehog'},
+  'Honey Badger':{body:'#bdbdbd',accent:'#212121',shape:'badger'},
+  'Dingo':       {body:'#d4a256',accent:'#b8860b',shape:'wolf'},
   'Turkey':      {body:'#795548',accent:'#e53935',shape:'bird_walk',wattle:true},
   // Arctic
-  'Polar Bear':  {body:'#f5f5f0',accent:'#ccc',shape:'quad',big:true},
+  'Polar Bear':  {body:'#f5f5f0',accent:'#d0d0cc',shape:'bear'},
   'Penguin':     {body:'#212121',belly:'#f5f5f5',shape:'penguin'},
   'Snowy Owl':   {body:'#f5f5f0',accent:'#ff8f00',shape:'bird'},
-  'Reindeer':    {body:'#8d6e63',accent:'#5d4037',shape:'quad',antlers:true},
-  'Arctic Wolf': {body:'#e0e0e0',accent:'#bdbdbd',shape:'quad',ears:'pointed'},
-  'Musk Ox':     {body:'#4e342e',accent:'#795548',shape:'quad',horns:true,big:true},
+  'Reindeer':    {body:'#8d6e63',accent:'#5d4037',shape:'deer'},
+  'Arctic Wolf': {body:'#e0e0e0',accent:'#bdbdbd',shape:'wolf'},
+  'Musk Ox':     {body:'#4e342e',accent:'#795548',shape:'bison'},
   'Swan':        {body:'#f5f5f0',accent:'#ff8f00',shape:'bird',neck:'long'},
   'Narwhal':     {body:'#b2ebf2',accent:'#e0f7fa',shape:'fish',horn:true},
   'Snow Bunting':{body:'#f5f5f0',accent:'#424242',shape:'bird'},
   'Seal':        {body:'#9e9e9e',belly:'#e0e0e0',shape:'seal'},
   // Savanna
-  'Lion':        {body:'#f9a825',accent:'#e65100',shape:'quad',mane:true,big:true},
-  'Elephant':    {body:'#9e9e9e',accent:'#bdbdbd',shape:'quad',trunk:true,big:true},
-  'Giraffe':     {body:'#f9a825',accent:'#5d4037',shape:'quad',neck:'long',spots:true},
-  'Zebra':       {body:'#f5f5f5',accent:'#212121',shape:'quad',stripes:true},
-  'Rhino':       {body:'#78909c',accent:'#546e7a',shape:'quad',horn:true,big:true},
-  'Hippo':       {body:'#90a4ae',accent:'#ef9a9a',shape:'quad',big:true},
-  'Warthog':     {body:'#a1887f',accent:'#f5f5f5',shape:'quad',horns:true},
-  'Wildebeest':  {body:'#5d4037',accent:'#3e2723',shape:'quad',horns:true,mane:true},
+  'Lion':        {body:'#f9a825',accent:'#e65100',shape:'cat',mane:true},
+  'Elephant':    {body:'#9e9e9e',accent:'#bdbdbd',shape:'elephant'},
+  'Giraffe':     {body:'#f9a825',accent:'#5d4037',shape:'giraffe'},
+  'Zebra':       {body:'#f5f5f5',accent:'#111',shape:'horse',stripes:true},
+  'Rhino':       {body:'#78909c',accent:'#546e7a',shape:'rhino'},
+  'Hippo':       {body:'#90a4ae',accent:'#ef9a9a',shape:'hippo'},
+  'Warthog':     {body:'#a1887f',accent:'#f5f0dc',shape:'warthog'},
+  'Wildebeest':  {body:'#5d4037',accent:'#3e2723',shape:'bison'},
   'Sec. Bird':   {body:'#607d8b',accent:'#f5f5f5',shape:'bird_walk'},
   'Flamingo':    {body:'#f48fb1',accent:'#880e4f',shape:'flamingo'},
-  'Meerkat':     {body:'#d4a256',accent:'#a1887f',shape:'quad'},
+  'Meerkat':     {body:'#d4a256',accent:'#a1887f',shape:'meerkat'},
   // Forest
-  'Bear':        {body:'#5d4037',accent:'#8d6e63',shape:'quad',big:true},
-  'Raccoon':     {body:'#757575',accent:'#212121',shape:'quad',mask:true},
-  'Beaver':      {body:'#795548',accent:'#5d4037',shape:'quad',tail:'flat'},
-  'Otter':       {body:'#6d4c41',belly:'#d7ccc8',shape:'quad'},
-  'Squirrel':    {body:'#bf8e5d',accent:'#a0522d',shape:'quad',tail:'bushy'},
-  'Bobcat':      {body:'#d4a256',accent:'#8b6914',shape:'quad',spots:true},
-  'Panda':       {body:'#f5f5f5',accent:'#212121',shape:'quad',patches:true},
-  'Bison':       {body:'#5d4037',accent:'#4e342e',shape:'quad',hump:true,mane:true,big:true},
+  'Bear':        {body:'#5d4037',accent:'#8d6e63',shape:'bear'},
+  'Raccoon':     {body:'#757575',accent:'#212121',shape:'raccoon'},
+  'Beaver':      {body:'#795548',accent:'#5d4037',shape:'beaver'},
+  'Otter':       {body:'#6d4c41',belly:'#d7ccc8',shape:'otter'},
+  'Squirrel':    {body:'#bf8e5d',accent:'#a0522d',shape:'squirrel'},
+  'Bobcat':      {body:'#d4a256',accent:'#8b6914',shape:'cat',spots:true},
+  'Panda':       {body:'#f5f5f5',accent:'#212121',shape:'bear',panda:true},
+  'Bison':       {body:'#5d4037',accent:'#4e342e',shape:'bison'},
   'Dove':        {body:'#e0e0e0',accent:'#bdbdbd',shape:'bird'},
   'Crow':        {body:'#212121',accent:'#424242',shape:'bird'},
   'Bee':         {body:'#fdd835',accent:'#212121',shape:'bee'},
@@ -288,413 +288,824 @@ function drawBubble(text,ax,ay,isUser){
 // ════════════════════════════════════════
 // ANIMAL SHAPE DRAWING
 // ════════════════════════════════════════
-function drawQuadruped(a,d){
-  const p=a.phase;
-  const sc=d.big?1.35:d.long?1.25:1;
-  const bw=26*sc,bh=14*sc;
-  const ls=Math.sin(p*3)*11;
-  ctx.strokeStyle=dk(d.body,25);ctx.lineWidth=4*sc;ctx.lineCap='round';
+function dk(hex,amt){
+  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  r=Math.max(0,r-amt);g=Math.max(0,g-amt);b=Math.max(0,b-amt);
+  return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function legs(x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+
+// ── CAT (tiger, lion, leopard, bobcat) ──
+function drawCat(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*13;
+  // curled tail
+  ctx.strokeStyle=d.accent||dk(d.body,25);ctx.lineWidth=5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-28,-6);ctx.quadraticCurveTo(-40,-18,-36,-28);ctx.stroke();
   // legs
-  [[bw*.5,ls],[bw*.5,-ls],[-bw*.5,-ls],[-bw*.5,ls]].forEach(([lx,sw])=>{
-    ctx.beginPath();ctx.moveTo(lx,bh*.7);ctx.lineTo(lx+sw*.5,bh*.7+18*sc);ctx.stroke();
+  ctx.strokeStyle=dk(d.body,25);ctx.lineWidth=5;
+  [[20,10,ls],[20,10,-ls],[-18,10,-ls],[-18,10,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.5,ly+20));
+  // sleek low body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,28,12,0,0,Math.PI*2);ctx.fill();
+  // stripes
+  if(d.stripes){ctx.strokeStyle=d.accent;ctx.lineWidth=3.5;for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(i*9,-12);ctx.lineTo(i*9+4,12);ctx.stroke();}}
+  // spots
+  if(d.spots){ctx.fillStyle=d.accent;[[-12,-3],[5,-6],[15,2],[-3,6],[10,-1]].forEach(([sx,sy])=>{ctx.beginPath();ctx.arc(sx,sy,3.5,0,Math.PI*2);ctx.fill();});}
+  // big mane ring for lion
+  if(d.mane){ctx.fillStyle=d.accent;ctx.beginPath();ctx.arc(26,-8,18,0,Math.PI*2);ctx.fill();}
+  // head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(26,-8,13,0,Math.PI*2);ctx.fill();
+  // pointed ears
+  ctx.fillStyle=d.body;
+  ctx.beginPath();ctx.moveTo(18,-20);ctx.lineTo(14,-32);ctx.lineTo(26,-22);ctx.fill();
+  ctx.beginPath();ctx.moveTo(30,-20);ctx.lineTo(36,-32);ctx.lineTo(38,-21);ctx.fill();
+  ctx.fillStyle='#e91e63';
+  ctx.beginPath();ctx.moveTo(19,-21);ctx.lineTo(16,-29);ctx.lineTo(25,-22);ctx.fill();
+  ctx.beginPath();ctx.moveTo(31,-21);ctx.lineTo(35,-29);ctx.lineTo(37,-22);ctx.fill();
+  // eye+nose
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(31,-10,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(32,-11,1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#e91e63';ctx.beginPath();ctx.arc(38,-6,2.5,0,Math.PI*2);ctx.fill();
+  // whisker dots
+  ctx.fillStyle='#222';[33,35,33].forEach((wx,i)=>{ctx.beginPath();ctx.arc(wx,-4+i*3,1,0,Math.PI*2);ctx.fill();});
+}
+
+// ── HORSE (horse, donkey, zebra) ──
+function drawHorse(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*14;
+  // legs – slim and long
+  ctx.strokeStyle=dk(d.body,30);ctx.lineWidth=4;ctx.lineCap='round';
+  [[18,10,ls],[18,10,-ls],[-16,10,-ls],[-16,10,ls]].forEach(([lx,ly,sw])=>{
+    legs(lx,ly,lx+sw*.45,ly+30);
+    ctx.fillStyle='#222';ctx.beginPath();ctx.ellipse(lx+sw*.45,ly+32,4,2.5,0,0,Math.PI*2);ctx.fill();
+  });
+  // flowing tail
+  ctx.strokeStyle=d.accent;ctx.lineWidth=6;
+  ctx.beginPath();ctx.moveTo(-26,-4);ctx.quadraticCurveTo(-40,8,-36,24);ctx.stroke();
+  // body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,26,14,0,0,Math.PI*2);ctx.fill();
+  if(d.stripes){ctx.strokeStyle=d.accent;ctx.lineWidth=4;for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(i*10,-14);ctx.lineTo(i*10+4,14);ctx.stroke();}}
+  // long neck
+  ctx.fillStyle=d.body;
+  ctx.beginPath();ctx.moveTo(16,-10);ctx.lineTo(22,-46);ctx.lineTo(8,-46);ctx.lineTo(4,-10);ctx.closePath();ctx.fill();
+  // mane along neck
+  if(d.mane){ctx.strokeStyle=d.accent;ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(16,-10);ctx.lineTo(20,-44);ctx.stroke();}
+  // head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(28,-52,12,9,.3,0,Math.PI*2);ctx.fill();
+  // muzzle
+  ctx.fillStyle=dk(d.body,15);ctx.beginPath();ctx.ellipse(38,-50,7,5,.2,0,Math.PI*2);ctx.fill();
+  // nostrils
+  ctx.fillStyle=dk(d.body,30);ctx.beginPath();ctx.arc(36,-48,1.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(40,-48,1.5,0,Math.PI*2);ctx.fill();
+  // ear
+  if(d.ears==='long'){ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(20,-58);ctx.lineTo(18,-78);ctx.lineTo(26,-58);ctx.fill();}
+  else{ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(20,-60);ctx.lineTo(18,-72);ctx.lineTo(26,-60);ctx.fill();}
+  // eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(33,-54,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(34,-55,1,0,Math.PI*2);ctx.fill();
+}
+
+// ── BEAR (bear, polar bear, panda) ──
+function drawBear(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*8;
+  ctx.strokeStyle=dk(d.body,25);ctx.lineWidth=8;ctx.lineCap='round';
+  [[18,12,ls],[18,12,-ls],[-18,12,-ls],[-18,12,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.3,ly+16));
+  // round stocky body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,26,20,0,0,Math.PI*2);ctx.fill();
+  // panda patches on body
+  if(d.panda){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(-12,4,9,7,-.3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(10,5,8,6,.3,0,Math.PI*2);ctx.fill();}
+  // BIG round head (nearly body-width)
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(22,-16,18,0,Math.PI*2);ctx.fill();
+  // panda eye patches
+  if(d.panda){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(16,-18,7,5,-.3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(26,-18,7,5,.3,0,Math.PI*2);ctx.fill();}
+  // snout
+  ctx.fillStyle=dk(d.body,12);ctx.beginPath();ctx.ellipse(34,-14,9,7,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#222';ctx.beginPath();ctx.ellipse(36,-12,3,2,0,0,Math.PI*2);ctx.fill();
+  // round ears
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(10,-32,8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(24,-32,8,0,Math.PI*2);ctx.fill();
+  if(d.panda){ctx.fillStyle=d.accent;ctx.beginPath();ctx.arc(10,-32,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(24,-32,6,0,Math.PI*2);ctx.fill();}
+  // eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(29,-18,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(30,-19,1.2,0,Math.PI*2);ctx.fill();
+}
+
+// ── ELEPHANT ──
+function drawElephant(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*8;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=11;ctx.lineCap='round';
+  [[22,16,ls],[22,16,-ls],[-18,16,-ls],[-18,16,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.2,ly+22));
+  // massive body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,34,22,0,0,Math.PI*2);ctx.fill();
+  // big head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(28,-14,22,0,Math.PI*2);ctx.fill();
+  // floppy ear (left side flap)
+  const earFlap=Math.sin(p*1.5)*6;
+  ctx.fillStyle=dk(d.body,8);ctx.beginPath();ctx.ellipse(12,-14+earFlap,24,30,-.25,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#f4a0a0';ctx.beginPath();ctx.ellipse(12,-14+earFlap,15,20,-.25,0,Math.PI*2);ctx.fill();
+  // head on top of ear
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(28,-14,22,0,Math.PI*2);ctx.fill();
+  // long trunk swinging
+  const trunkWave=Math.sin(p*1.5)*10;
+  ctx.strokeStyle=d.body;ctx.lineWidth=9;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(48,-10);ctx.quadraticCurveTo(58,-2+trunkWave,54,20+trunkWave);ctx.stroke();
+  // trunk tip curl
+  ctx.beginPath();ctx.arc(54,22+trunkWave,4,0,Math.PI*2);ctx.stroke();
+  // tusk
+  ctx.strokeStyle='#f5f0dc';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(46,-6);ctx.quadraticCurveTo(56,2,54,14);ctx.stroke();
+  // tiny eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(42,-20,3.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(43,-21,1.3,0,Math.PI*2);ctx.fill();
+  // small top ear
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(18,-34,6,0,Math.PI*2);ctx.fill();
+}
+
+// ── GIRAFFE ──
+function drawGiraffe(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*11;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=3.5;ctx.lineCap='round';
+  [[16,10,ls],[10,10,-ls],[-10,10,-ls],[-16,10,ls]].forEach(([lx,ly,sw])=>{
+    legs(lx,ly,lx+sw*.4,ly+34);
+    ctx.fillStyle='#333';ctx.beginPath();ctx.ellipse(lx+sw*.4,ly+36,3.5,2.5,0,0,Math.PI*2);ctx.fill();
+  });
+  // small body with spots
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,22,13,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;[[-10,-2,8,5],[6,-5,7,5],[14,3,6,4],[-2,6,7,4]].forEach(([sx,sy,sw,sh])=>{ctx.beginPath();ctx.ellipse(sx,sy,sw,sh,.4,0,Math.PI*2);ctx.fill();});
+  // VERY long neck — this is what makes a giraffe!
+  ctx.fillStyle=d.body;
+  ctx.beginPath();ctx.moveTo(14,-10);ctx.lineTo(18,-90);ctx.lineTo(6,-90);ctx.lineTo(2,-10);ctx.closePath();ctx.fill();
+  // spots on neck
+  ctx.fillStyle=d.accent;
+  for(let i=0;i<6;i++){ctx.beginPath();ctx.ellipse(10+Math.sin(i)*3,-(18+i*12),5,3.5,.3,0,Math.PI*2);ctx.fill();}
+  // small head at top
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(18,-96,10,7,.2,0,Math.PI*2);ctx.fill();
+  // ossicones (little bumpy horns)
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(12,-104,2.5,5,-.1,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(18,-104,2.5,5,.1,0,Math.PI*2);ctx.fill();
+  // eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(23,-97,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(24,-98,1,0,Math.PI*2);ctx.fill();
+}
+
+// ── CROCODILE — long, flat, ridged ──
+function drawCroc(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*5;
+  const tailSwing=Math.sin(p*1.5)*14;
+  // short splayed legs
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4;ctx.lineCap='round';
+  legs(16,6,28,16+ls);legs(16,6,28,-4+ls);legs(-12,6,-24,16-ls);legs(-12,6,-24,-4-ls);
+  // swinging tail
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(-40,0);ctx.quadraticCurveTo(-58,tailSwing,-70,tailSwing*1.4);ctx.quadraticCurveTo(-58,6+tailSwing*.3,-40,7);ctx.closePath();ctx.fill();
+  // VERY long flat body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(-8,0,44,10,0,0,Math.PI*2);ctx.fill();
+  // ridged spine — very distinctive!
+  ctx.fillStyle=dk(d.body,18);
+  for(let i=-4;i<=4;i++){ctx.beginPath();ctx.moveTo(i*9-4,-10);ctx.lineTo(i*9-6,-20);ctx.lineTo(i*9+2,-20);ctx.lineTo(i*9+4,-10);ctx.closePath();ctx.fill();}
+  // belly color
+  ctx.fillStyle=d.belly||'#a5d6a7';ctx.beginPath();ctx.ellipse(-8,4,42,6,0,0,Math.PI*2);ctx.fill();
+  // long flat snout
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(36,-8);ctx.lineTo(72,-6);ctx.lineTo(72,8);ctx.lineTo(36,8);ctx.closePath();ctx.fill();
+  // teeth along snout
+  ctx.fillStyle='#fff';
+  for(let i=0;i<7;i++){ctx.beginPath();ctx.moveTo(40+i*5,-8);ctx.lineTo(42+i*5,-14);ctx.lineTo(44+i*5,-8);ctx.fill();}
+  // eye on TOP of head (croc eyes are on top!)
+  ctx.fillStyle='#ffd700';ctx.beginPath();ctx.ellipse(32,-12,6,4,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.ellipse(32,-12,2,3.5,0,0,Math.PI*2);ctx.fill();
+}
+
+// ── RHINO ──
+function drawRhino(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*8;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=10;ctx.lineCap='round';
+  [[20,14,ls],[20,14,-ls],[-16,14,-ls],[-16,14,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.2,ly+18));
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,32,20,0,0,Math.PI*2);ctx.fill();
+  // skin fold lines
+  ctx.strokeStyle=dk(d.body,18);ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(14,-20);ctx.lineTo(14,20);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-14,-20);ctx.lineTo(-14,20);ctx.stroke();
+  // big wide head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(36,-6,22,17,.05,0,Math.PI*2);ctx.fill();
+  // BIG horns — what makes a rhino!
+  ctx.fillStyle=dk(d.body,35);
+  ctx.beginPath();ctx.moveTo(50,-22);ctx.lineTo(62,-42);ctx.lineTo(56,-18);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(44,-18);ctx.lineTo(52,-32);ctx.lineTo(48,-14);ctx.closePath();ctx.fill();
+  // small ear
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(22,-22,7,0,Math.PI*2);ctx.fill();
+  // eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(40,-12,3.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(41,-13,1.3,0,Math.PI*2);ctx.fill();
+}
+
+// ── HIPPO ──
+function drawHippo(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*7;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=10;ctx.lineCap='round';
+  [[20,16,ls],[20,16,-ls],[-18,16,-ls],[-18,16,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.2,ly+16));
+  // giant round body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,32,22,0,0,Math.PI*2);ctx.fill();
+  // HUGE head — almost as big as body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(34,2,26,20,.05,0,Math.PI*2);ctx.fill();
+  // wide open mouth area
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(44,10,18,10,.05,0,Math.PI);ctx.fill();
+  // big teeth
+  ctx.fillStyle='#fffde7';ctx.beginPath();ctx.moveTo(34,10);ctx.lineTo(34,22);ctx.lineTo(40,10);ctx.fill();
+  ctx.beginPath();ctx.moveTo(46,10);ctx.lineTo(48,22);ctx.lineTo(54,10);ctx.fill();
+  // nostrils on top of snout
+  ctx.fillStyle=dk(d.body,25);
+  ctx.beginPath();ctx.ellipse(52,-4,5,4,.2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(58,-3,5,4,-.2,0,Math.PI*2);ctx.fill();
+  // tiny eyes on top of head
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(28,-14,4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(29,-15,1.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(20,-20,6,0,Math.PI*2);ctx.fill();
+}
+
+// ── CAMEL ──
+function drawCamel(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*13;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=5;ctx.lineCap='round';
+  [[18,10,ls],[18,10,-ls],[-14,10,-ls],[-14,10,ls]].forEach(([lx,ly,sw])=>{
+    legs(lx,ly,lx+sw*.4,ly+30);
+    ctx.fillStyle=dk(d.body,10);ctx.beginPath();ctx.ellipse(lx+sw*.4,ly+32,6,4,0,0,Math.PI*2);ctx.fill();
   });
   // body
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,bw,bh,0,0,Math.PI*2);ctx.fill();
-  if(d.fluffy){
-    ctx.fillStyle='rgba(255,255,255,0.5)';
-    for(let i=-2;i<=2;i++){ctx.beginPath();ctx.arc(i*10,-(bh*.6),7,0,Math.PI*2);ctx.fill();}
-  }
-  if(d.mane&&!d.big){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(-4,-bh*.8,bw*.35,bh*.85,0,0,Math.PI*2);ctx.fill();}
-  if(d.hump){ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(-5,-bh-7,11,14,0,0,Math.PI*2);ctx.fill();}
-  if(d.stripes){ctx.strokeStyle=d.accent;ctx.lineWidth=3*sc;for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(i*10,-bh-2);ctx.lineTo(i*10+3,bh+2);ctx.stroke();}}
-  if(d.spots){ctx.fillStyle=d.accent;[[-12,-3],[5,-7],[15,2],[-2,6]].forEach(([sx,sy])=>{ctx.beginPath();ctx.ellipse(sx*sc,sy*sc,4,3,.5,0,Math.PI*2);ctx.fill();});}
-  if(d.patches){ctx.fillStyle=d.accent;[[-9,0,8,6],[9,3,7,5]].forEach(([px,py,pw,ph])=>{ctx.beginPath();ctx.ellipse(px,py,pw,ph,0,0,Math.PI*2);ctx.fill();});}
-  if(d.spiky){ctx.strokeStyle=d.accent;ctx.lineWidth=1.5;for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(i*8,-bh);ctx.lineTo(i*8+2,-bh-12);ctx.stroke();}}
-  if(d.mask){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(bw*.55,-2,11,7,0,0,Math.PI*2);ctx.fill();}
-  if(d.tail==='bushy'){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(-bw-4,-bh*.3,10,18,-.5,0,Math.PI*2);ctx.fill();}
-  if(d.tail==='flat'){ctx.fillStyle=dk(d.body,20);ctx.beginPath();ctx.ellipse(-bw-8,6,14,7,.2,0,Math.PI*2);ctx.fill();}
-  // neck
-  const neckH=d.neck==='long'?44*sc:13*sc;
-  ctx.fillStyle=d.body;
-  ctx.beginPath();ctx.moveTo(bw*.5,-bh*.5);ctx.lineTo(bw*.6,-bh*.5-neckH);ctx.lineTo(bw*.35,-bh*.5-neckH);ctx.closePath();ctx.fill();
-  // head
-  const hx=bw*.8,hy=-(neckH+9*sc),hr=12*sc;
-  ctx.fillStyle=d.head||d.body;
-  ctx.beginPath();ctx.ellipse(hx,hy,hr*1.1,hr,.2,0,Math.PI*2);ctx.fill();
-  if(d.mane&&d.big){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(hx*.6,hy*.8,bw*.3,bh*1.1,0,0,Math.PI*2);ctx.fill();}
-  // ears
-  if(d.ears==='long'||d.ears==='huge'){
-    const ew=d.ears==='huge'?9:5,eh=d.ears==='huge'?17:12;
-    ctx.fillStyle=d.body;
-    ctx.beginPath();ctx.ellipse(hx-5,hy-hr-eh*.5,ew,eh,-.3,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(hx+3,hy-hr-eh*.4,ew-1,eh,.3,0,Math.PI*2);ctx.fill();
-  } else {
-    ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(hx-5,hy-hr+3,5*sc,0,Math.PI*2);ctx.fill();
-    if(d.ears==='pointed'){ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(hx-6,hy-hr+2);ctx.lineTo(hx-10,hy-hr-9);ctx.lineTo(hx-2,hy-hr+2);ctx.fill();}
-  }
-  // horns/antlers
-  if(d.horns||d.antlers){
-    ctx.strokeStyle=d.accent||'#8B7355';ctx.lineWidth=2.5;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(hx-4,hy-hr);ctx.lineTo(hx-8,hy-hr-14);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(hx+4,hy-hr);ctx.lineTo(hx+8,hy-hr-13);ctx.stroke();
-    if(d.antlers){ctx.beginPath();ctx.moveTo(hx-7,hy-hr-9);ctx.lineTo(hx-13,hy-hr-7);ctx.stroke();ctx.beginPath();ctx.moveTo(hx+7,hy-hr-8);ctx.lineTo(hx+13,hy-hr-6);ctx.stroke();}
-  }
-  if(d.horn){ctx.strokeStyle='#8B7355';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(hx+hr,hy-2);ctx.lineTo(hx+hr+10,hy-12);ctx.stroke();}
-  if(d.trunk){ctx.strokeStyle=d.body;ctx.lineWidth=7*sc;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(hx+hr,hy);ctx.quadraticCurveTo(hx+hr+18,hy+10,hx+hr+14,hy+24*sc);ctx.stroke();}
-  if(d.snout){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(hx+hr*.7,hy+3,6,5,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#442';ctx.beginPath();ctx.arc(hx+hr*.7-2,hy+3,1.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(hx+hr*.7+2,hy+3,1.5,0,Math.PI*2);ctx.fill();}
-  if(d.beard){ctx.fillStyle='#ccc';ctx.beginPath();ctx.ellipse(hx+hr*.5,hy+hr*.8,4,7,0,0,Math.PI*2);ctx.fill();}
-  // eye
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(hx+5*sc,hy-3*sc,2.5,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(hx+6*sc,hy-4*sc,1,0,Math.PI*2);ctx.fill();
-}
-
-function drawFish(a,d){
-  const p=a.phase;
-  const sc=d.big?1.5:1;
-  const tw=Math.sin(p*2.5)*14; // tail wag
-  // tail
-  ctx.fillStyle=d.body;
-  ctx.beginPath();ctx.moveTo(-22*sc,0);ctx.lineTo(-32*sc+tw,-12*sc);ctx.lineTo(-32*sc+tw,12*sc);ctx.closePath();ctx.fill();
-  // body
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,22*sc,11*sc,0,0,Math.PI*2);ctx.fill();
-  if(d.belly){ctx.fillStyle=d.belly;ctx.beginPath();ctx.ellipse(2*sc,3*sc,16*sc,7*sc,0,0,Math.PI*2);ctx.fill();}
-  if(d.stripes){ctx.strokeStyle=d.accent;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(2,-11*sc);ctx.lineTo(2,11*sc);ctx.stroke();ctx.beginPath();ctx.moveTo(-8,-10*sc);ctx.lineTo(-8,10*sc);ctx.stroke();}
-  if(d.spiky){ctx.strokeStyle=d.accent;ctx.lineWidth=2;for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(i*7,-11*sc);ctx.lineTo(i*7-2,-18*sc);ctx.stroke();}}
-  if(d.horn){ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(22*sc,-2);ctx.lineTo(22*sc+20,-10);ctx.stroke();}
-  // dorsal fin
-  if(d.fin){ctx.fillStyle=dk(d.body,15);ctx.beginPath();ctx.moveTo(-5,-11*sc);ctx.lineTo(5,-22*sc);ctx.lineTo(14,-11*sc);ctx.closePath();ctx.fill();}
-  // beak/snout
-  if(d.beak){ctx.fillStyle=d.belly||'#e0e0e0';ctx.beginPath();ctx.ellipse(26*sc,0,8*sc,5*sc,0,0,Math.PI*2);ctx.fill();}
-  // eye
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(14*sc,-3*sc,3,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(15*sc,-4*sc,1.2,0,Math.PI*2);ctx.fill();
-}
-
-function drawBird(a,d){
-  const p=a.phase;
-  const wingY=Math.sin(p*3)*18;
-  // wings
-  ctx.fillStyle=d.accent||dk(d.body,20);
-  ctx.beginPath();ctx.ellipse(-5,-wingY,18,8,-.4,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(-5,wingY,18,8,.4,0,Math.PI*2);ctx.fill();
-  // body
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,16,10,0,0,Math.PI*2);ctx.fill();
-  // neck long (swan)
-  if(d.neck==='long'){ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(12,-4);ctx.quadraticCurveTo(22,-20,18,-32);ctx.quadraticCurveTo(14,-38,10,-32);ctx.quadraticCurveTo(14,-22,8,-4);ctx.closePath();ctx.fill();}
-  // head
-  const hx=d.neck==='long'?12:14,hy=d.neck==='long'?-34:-10;
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(hx,hy,8,0,Math.PI*2);ctx.fill();
-  // beak
-  ctx.fillStyle=d.accent||'#e67e22';ctx.beginPath();ctx.moveTo(hx+7,hy);ctx.lineTo(hx+16,hy+2);ctx.lineTo(hx+7,hy+3);ctx.closePath();ctx.fill();
-  // crest
-  if(d.crest){ctx.fillStyle=d.accent||'#fff';ctx.beginPath();ctx.ellipse(hx,hy-8,4,10,0,0,Math.PI*2);ctx.fill();}
-  // eye
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(hx+3,hy-2,2,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(hx+3.5,hy-2.5,.8,0,Math.PI*2);ctx.fill();
-  // tail fan (peacock)
-  if(d.tail==='fan'){
-    for(let i=-3;i<=3;i++){
-      ctx.strokeStyle=d.accent;ctx.lineWidth=2;
-      ctx.beginPath();ctx.moveTo(-10,0);ctx.lineTo(-10+i*6-24,-20+Math.abs(i)*8);ctx.stroke();
-      ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(-10+i*6-24,-22+Math.abs(i)*8,4,0,Math.PI*2);ctx.fill();
-    }
-  }
-}
-
-function drawBirdWalk(a,d){
-  const p=a.phase;
-  const ls=Math.sin(p*3)*10;
-  // legs
-  ctx.strokeStyle='#e67e22';ctx.lineWidth=3;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(3,10);ctx.lineTo(3+ls,26);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-3,10);ctx.lineTo(-3-ls,26);ctx.stroke();
-  // feet
-  ctx.beginPath();ctx.moveTo(3+ls,26);ctx.lineTo(3+ls+6,28);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(-3-ls,26);ctx.lineTo(-3-ls+6,28);ctx.stroke();
-  // body
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,14,11,-.3,0,Math.PI*2);ctx.fill();
-  // wing
-  ctx.fillStyle=dk(d.body,20);ctx.beginPath();ctx.ellipse(-3,-2,12,7,.3,0,Math.PI*2);ctx.fill();
-  // tail fan (peacock/rooster)
-  if(d.tail==='fan'){
-    for(let i=-2;i<=2;i++){ctx.strokeStyle=d.accent;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-12,2);ctx.lineTo(-22+i*5,2+Math.abs(i)*7-18);ctx.stroke();}
-  }
-  // head + neck
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(14,-12,9,8,-.2,0,Math.PI*2);ctx.fill();
-  // comb
-  if(d.comb){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(14,-22,4,7,0,0,Math.PI*2);ctx.fill();}
-  // wattle
-  if(d.wattle){ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(16,-8,4,7,.2,0,Math.PI*2);ctx.fill();}
-  // beak
-  ctx.fillStyle='#e8b800';ctx.beginPath();ctx.moveTo(22,-12);ctx.lineTo(30,-11);ctx.lineTo(22,-10);ctx.closePath();ctx.fill();
-  // eye
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(17,-14,2.5,0,Math.PI*2);ctx.fill();
-}
-
-function drawFlamingo(a,d){
-  const p=a.phase;
-  // one-leg stand animation
-  const legRaise=Math.abs(Math.sin(p*0.8))<0.5?1:0;
-  ctx.strokeStyle='#ec407a';ctx.lineWidth=5;ctx.lineCap='round';
-  // standing leg
-  ctx.beginPath();ctx.moveTo(0,8);ctx.lineTo(-2,36);ctx.stroke();
-  // raised leg (sometimes)
-  if(legRaise){ctx.beginPath();ctx.moveTo(0,8);ctx.lineTo(-10,22);ctx.stroke();}
-  // body (oval, pink)
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,16,12,.3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,26,14,0,0,Math.PI*2);ctx.fill();
+  // BIG HUMP — the camel's signature!
+  ctx.fillStyle=dk(d.body,10);ctx.beginPath();ctx.ellipse(2,-24,13,20,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(2,-14,13,12,0,0,Math.PI*2);ctx.fill();
   // long curved neck
-  ctx.strokeStyle=d.body;ctx.lineWidth=8;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(8,-8);ctx.quadraticCurveTo(18,-28,10,-44);ctx.stroke();
+  ctx.fillStyle=d.body;
+  ctx.beginPath();ctx.moveTo(18,-10);ctx.quadraticCurveTo(32,-24,24,-46);ctx.quadraticCurveTo(18,-50,12,-46);ctx.quadraticCurveTo(16,-26,8,-10);ctx.closePath();ctx.fill();
   // head
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(10,-44,8,0,Math.PI*2);ctx.fill();
-  // bent beak (flamingo beak bends down)
-  ctx.fillStyle='#f48fb1';ctx.beginPath();ctx.moveTo(18,-44);ctx.lineTo(26,-44);ctx.lineTo(24,-50);ctx.lineTo(16,-48);ctx.closePath();ctx.fill();
-  ctx.fillStyle=d.accent;ctx.beginPath();ctx.moveTo(22,-50);ctx.lineTo(26,-56);ctx.lineTo(24,-44);ctx.closePath();ctx.fill();
-  // eye
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(13,-47,2,0,Math.PI*2);ctx.fill();
-}
-
-function drawPenguin(a,d){
-  const p=a.phase;
-  const ls=Math.sin(p*3)*8;
-  ctx.strokeStyle='#333';ctx.lineWidth=4;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(-4,14);ctx.lineTo(-4+ls,28);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(4,14);ctx.lineTo(4-ls,28);ctx.stroke();
-  // body
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,2,13,18,0,0,Math.PI*2);ctx.fill();
-  // belly
-  ctx.fillStyle=d.belly||'#fff';ctx.beginPath();ctx.ellipse(0,4,8,13,0,0,Math.PI*2);ctx.fill();
-  // head
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(0,-18,11,0,Math.PI*2);ctx.fill();
-  // face
-  ctx.fillStyle=d.belly||'#fff';ctx.beginPath();ctx.ellipse(0,-17,6,5,0,0,Math.PI*2);ctx.fill();
-  // beak
-  ctx.fillStyle='#e67e22';ctx.beginPath();ctx.moveTo(0,-13);ctx.lineTo(8,-13);ctx.lineTo(4,-10);ctx.closePath();ctx.fill();
-  // eye
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(5,-20,2.5,0,Math.PI*2);ctx.fill();
-  // wings/flippers
-  ctx.fillStyle=dk(d.body,10);
-  ctx.beginPath();ctx.ellipse(-15,0,6,15,-.4,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(15,0,6,15,.4,0,Math.PI*2);ctx.fill();
-}
-
-function drawMonkeyShape(a,d){
-  const p=a.phase;
-  // arms reaching for branch (swinging)
-  const armSwing=Math.sin(p*2)*20;
-  ctx.strokeStyle=d.body;ctx.lineWidth=5;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(-8,-8);ctx.lineTo(-18+armSwing,-30);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(8,-8);ctx.lineTo(18+armSwing,-30);ctx.stroke();
-  // hands grip point
-  ctx.fillStyle=d.accent;ctx.beginPath();ctx.arc(-18+armSwing,-30,5,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(18+armSwing,-30,5,0,Math.PI*2);ctx.fill();
-  // body
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,4,13,16,0,0,Math.PI*2);ctx.fill();
-  // head
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(0,-14,13,0,Math.PI*2);ctx.fill();
-  // face
-  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(0,-12,9,8,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(24,-52,12,8,.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.body,10);ctx.beginPath();ctx.ellipse(34,-50,7,5,.2,0,Math.PI*2);ctx.fill();
+  // camel lips (distinctive droopy lips)
+  ctx.fillStyle=dk(d.body,20);ctx.beginPath();ctx.ellipse(38,-48,5,4,.2,0,Math.PI*2);ctx.fill();
   // ears
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(-13,-14,6,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(13,-14,6,0,Math.PI*2);ctx.fill();
-  // tail
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(16,-60,4,7,-.2,0,Math.PI*2);ctx.fill();
+  // eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(28,-54,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(29,-55,1,0,Math.PI*2);ctx.fill();
+}
+
+// ── PIG ──
+function drawPig(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*7;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=7;ctx.lineCap='round';
+  [[16,14,ls],[16,14,-ls],[-16,14,-ls],[-16,14,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.2,ly+12));
+  // curly tail
   ctx.strokeStyle=d.body;ctx.lineWidth=4;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(0,20);ctx.quadraticCurveTo(20,32,14,42);ctx.stroke();
+  ctx.beginPath();ctx.arc(-30,-4,8,-.3,Math.PI*.8);ctx.stroke();
+  // very round fat body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,24,20,0,0,Math.PI*2);ctx.fill();
+  // round head same size as body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(26,-8,16,0,Math.PI*2);ctx.fill();
+  // round ears
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(16,-22,8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(28,-22,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.arc(16,-22,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(28,-22,5,0,Math.PI*2);ctx.fill();
+  // BIG round snout — very distinctive!
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(40,-6,11,9,.05,0,Math.PI*2);ctx.fill();
+  // nostrils
+  ctx.fillStyle=dk(d.accent,30);ctx.beginPath();ctx.ellipse(37,-6,3,2.5,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(43,-6,3,2.5,0,0,Math.PI*2);ctx.fill();
+  // eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(32,-12,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(33,-13,1.2,0,Math.PI*2);ctx.fill();
+}
+
+// ── RABBIT ──
+function drawRabbit(a,d){
+  const p=a.phase;
+  const hop=Math.abs(Math.sin(p*3))*7;
+  // big back feet
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(-10,18,10,5,.4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(10,18,10,5,-.4,0,Math.PI*2);ctx.fill();
+  // upright oval body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,2,14,18,0,0,Math.PI*2);ctx.fill();
+  // small front paws
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4;ctx.lineCap='round';
+  legs(10,6,14,14-hop);legs(-10,6,-14,14-hop);
+  // fluffy round head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(4,-18,13,0,Math.PI*2);ctx.fill();
+  // VERY LONG upright ears — unmistakable rabbit feature!
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(-3,-36,5,20,-.08,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(9,-36,5,20,.08,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(-3,-36,2.5,15,-.08,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(9,-36,2.5,15,.08,0,Math.PI*2);ctx.fill();
+  // fluffy tail
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-14,6,7,0,Math.PI*2);ctx.fill();
+  // nose + eye
+  ctx.fillStyle='#ff9999';ctx.beginPath();ctx.arc(14,-18,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(10,-22,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(11,-23,1,0,Math.PI*2);ctx.fill();
+}
+
+// ── GORILLA ──
+function drawGorilla(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*10;
+  // LONG arms reaching ground — knuckle walk!
+  ctx.strokeStyle=dk(d.body,15);ctx.lineWidth=9;ctx.lineCap='round';
+  legs(22,-2,38,22+ls*.5);legs(-22,-2,-36,22-ls*.5);
+  // knuckle fists
+  ctx.fillStyle=dk(d.body,20);ctx.beginPath();ctx.ellipse(38,24+ls*.5,8,5,.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(-36,24-ls*.5,8,5,-.2,0,Math.PI*2);ctx.fill();
+  // short legs
+  ctx.lineWidth=8;legs(14,18,14+ls*.3,36);legs(-14,18,-14-ls*.3,36);
+  // barrel chest — much bigger than the hips
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,2,28,22,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(0,4,16,14,0,0,Math.PI*2);ctx.fill();
+  // massive heavy head, barely a neck
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(4,-22,20,18,0,0,Math.PI*2);ctx.fill();
+  // sagittal crest (ridge on top of skull)
+  ctx.fillStyle=dk(d.body,12);ctx.beginPath();ctx.ellipse(4,-38,6,10,0,0,Math.PI*2);ctx.fill();
+  // dark flat face
+  ctx.fillStyle='#2c1810';ctx.beginPath();ctx.ellipse(8,-20,14,13,.05,0,Math.PI*2);ctx.fill();
+  // light muzzle
+  ctx.fillStyle='#8d6e63';ctx.beginPath();ctx.ellipse(10,-15,9,8,.1,0,Math.PI*2);ctx.fill();
+  // small ears low on head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(-14,-20,7,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(18,-20,7,0,Math.PI*2);ctx.fill();
   // eyes
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(-4,-14,2.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(4,-14,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(4,-22,3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(14,-22,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(5,-23,1.2,0,Math.PI*2);ctx.fill();
 }
 
-function drawOctopus(a,d){
-  const p=a.phase;
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(0,-6,18,0,Math.PI*2);ctx.fill();
-  for(let i=0;i<8;i++){
-    const angle=(i/8)*Math.PI+Math.PI*.1;
-    const tx=Math.cos(angle)*16,ty=Math.sin(angle)*10+6;
-    const cx1=tx+Math.cos(angle-1)*20,cy1=ty+Math.sin(angle-1)*20+Math.sin(p+i)*.8*12;
-    const cx2=tx+Math.cos(angle+.5)*24,cy2=ty+Math.sin(angle+.5)*24+Math.cos(p+i*.7)*10;
-    ctx.strokeStyle=d.body;ctx.lineWidth=5;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(tx,ty);ctx.quadraticCurveTo(cx1,cy1,cx2,cy2+12);ctx.stroke();
-  }
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(-6,-8,4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(6,-8,4,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-5,-9,1.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(7,-9,1.5,0,Math.PI*2);ctx.fill();
-}
-
-function drawJellyfish(a,d){
-  const p=a.phase;
-  const pulse=1+Math.sin(p*1.5)*.12;
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,-4,20*pulse,14,0,Math.PI,Math.PI*2);ctx.fill();
-  ctx.fillStyle=d.accent||d.body;ctx.globalAlpha=.6;ctx.beginPath();ctx.ellipse(0,-4,14*pulse,9,0,Math.PI,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
-  const tentN=8;
-  for(let i=0;i<tentN;i++){
-    const tx=-18+i*(36/(tentN-1));
-    ctx.strokeStyle=d.accent;ctx.lineWidth=2;ctx.globalAlpha=.8;
-    ctx.beginPath();ctx.moveTo(tx,8);
-    for(let j=0;j<4;j++){const wv=Math.sin(p*1.5+i+j)*8;ctx.lineTo(tx+wv,8+j*10);}
-    ctx.stroke();ctx.globalAlpha=1;
-  }
-}
-
-function drawCrab(a,d){
-  const p=a.phase;
-  const sc=d.big?1.3:1;
-  // legs
-  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=3*sc;ctx.lineCap='round';
-  for(let i=-2;i<=2;i++){if(i===0)continue;const legY=Math.sin(p*3+i)*5;ctx.beginPath();ctx.moveTo(i*8*sc,4*sc);ctx.lineTo(i*16*sc,8*sc+legY);ctx.stroke();}
-  // body
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,18*sc,12*sc,0,0,Math.PI*2);ctx.fill();
-  // claws
-  ctx.fillStyle=d.accent;
-  ctx.beginPath();ctx.ellipse(-26*sc,0,10*sc,7*sc,-.3,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(26*sc,0,10*sc,7*sc,.3,0,Math.PI*2);ctx.fill();
-  // claw tips
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(-28*sc,-4*sc,5*sc,4*sc,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(-28*sc,4*sc,5*sc,4*sc,0,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(28*sc,-4*sc,5*sc,4*sc,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(28*sc,4*sc,5*sc,4*sc,0,0,Math.PI*2);ctx.fill();
-  // eyes on stalks
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(-6,-16,4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(6,-16,4,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(-6,-17,2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(6,-17,2,0,Math.PI*2);ctx.fill();
-}
-
-function drawSeal(a,d){
-  const p=a.phase;
-  const wave=Math.sin(p*2)*8;
-  ctx.fillStyle=d.body;
-  ctx.beginPath();ctx.moveTo(-24,0);ctx.quadraticCurveTo(-28,wave,-16,14);ctx.quadraticCurveTo(0,20,14,10);ctx.quadraticCurveTo(26,0,20,-8);ctx.quadraticCurveTo(8,-18,-8,-12);ctx.quadraticCurveTo(-18,-8,-24,0);ctx.fill();
-  if(d.belly){ctx.fillStyle=d.belly;ctx.beginPath();ctx.ellipse(0,4,14,8,-.1,0,Math.PI*2);ctx.fill();}
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(22,-6,10,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(26,-8,3,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-24,0);ctx.lineTo(-36,-5);ctx.lineTo(-32,6);ctx.stroke();
-}
-
-function drawSnake(a,d){
-  const p=a.phase;
-  ctx.strokeStyle=d.body;ctx.lineWidth=10;ctx.lineCap='round';ctx.lineJoin='round';
-  ctx.beginPath();
-  const pts=[];
-  for(let i=0;i<=6;i++){const t=i/6;pts.push([i*12-36,Math.sin(p*1.5+i*1.2)*18]);}
-  ctx.moveTo(pts[0][0],pts[0][1]);
-  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
-  ctx.stroke();
-  // pattern
-  ctx.strokeStyle=d.accent;ctx.lineWidth=5;
-  ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
-  ctx.stroke();
+// ── DEER / REINDEER ──
+function drawDeer(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*13;
+  ctx.strokeStyle=dk(d.body,25);ctx.lineWidth=3.5;ctx.lineCap='round';
+  [[16,10,ls],[12,10,-ls],[-12,10,-ls],[-16,10,ls]].forEach(([lx,ly,sw])=>{
+    legs(lx,ly,lx+sw*.45,ly+28);
+    ctx.fillStyle='#333';ctx.beginPath();ctx.ellipse(lx+sw*.45,ly+30,3,2,0,0,Math.PI*2);ctx.fill();
+  });
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,22,12,0,0,Math.PI*2);ctx.fill();
+  // neck
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(14,-10);ctx.lineTo(18,-38);ctx.lineTo(6,-38);ctx.lineTo(2,-10);ctx.closePath();ctx.fill();
   // head
-  const hx=pts[pts.length-1][0],hy=pts[pts.length-1][1];
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(hx+8,hy,10,7,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(hx+14,hy-2,2,0,Math.PI*2);ctx.fill();
-  // tongue
-  ctx.strokeStyle='#e53935';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(hx+18,hy);ctx.lineTo(hx+24,hy-3);ctx.moveTo(hx+18,hy);ctx.lineTo(hx+24,hy+3);ctx.stroke();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(20,-44,10,8,.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.body,12);ctx.beginPath();ctx.ellipse(28,-42,6,5,.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(14,-50,4,7,-.3,0,Math.PI*2);ctx.fill();
+  // EYE
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(26,-46,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(27,-47,1,0,Math.PI*2);ctx.fill();
+  // BIG ANTLERS — unmistakable reindeer feature!
+  ctx.strokeStyle=d.accent||'#5d4037';ctx.lineWidth=3;ctx.lineCap='round';
+  // left antler
+  ctx.beginPath();ctx.moveTo(14,-50);ctx.lineTo(6,-70);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(9,-62);ctx.lineTo(-2,-66);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(6,-70);ctx.lineTo(-4,-76);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(6,-70);ctx.lineTo(10,-78);ctx.stroke();
+  // right antler
+  ctx.beginPath();ctx.moveTo(22,-50);ctx.lineTo(30,-70);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(27,-62);ctx.lineTo(38,-66);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(30,-70);ctx.lineTo(40,-76);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(30,-70);ctx.lineTo(26,-78);ctx.stroke();
 }
 
-function drawButterfly(a,d){
-  const p=a.phase;
-  const wf=Math.sin(p*4)*25;
+// ── WOLF / DINGO ──
+function drawWolf(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*12;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4.5;ctx.lineCap='round';
+  [[18,10,ls],[18,10,-ls],[-16,10,-ls],[-16,10,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.4,ly+22));
+  // bushy tail
+  ctx.fillStyle=dk(d.body,8);ctx.beginPath();ctx.ellipse(-32,-4,14,9,-.3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-38,-2,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,26,13,0,0,Math.PI*2);ctx.fill();
+  // neck + head with pointed snout
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(16,-10);ctx.lineTo(20,-34);ctx.lineTo(8,-34);ctx.lineTo(4,-10);ctx.closePath();ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(20,-40,13,10,.1,0,Math.PI*2);ctx.fill();
+  // POINTED snout
+  ctx.beginPath();ctx.moveTo(22,-34);ctx.lineTo(38,-38);ctx.lineTo(22,-44);ctx.fill();
+  ctx.fillStyle='#222';ctx.beginPath();ctx.arc(37,-38,2.5,0,Math.PI*2);ctx.fill();
+  // pointed ears
   ctx.fillStyle=d.body;
-  ctx.beginPath();ctx.ellipse(-16,-wf*.6,22,14,.5,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(-16,wf*.6,22,14,-.5,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(12,-wf*.4,14,10,.3,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(12,wf*.4,14,10,-.3,0,Math.PI*2);ctx.fill();
-  // wing spots
+  ctx.beginPath();ctx.moveTo(12,-48);ctx.lineTo(8,-62);ctx.lineTo(20,-50);ctx.fill();
+  ctx.beginPath();ctx.moveTo(24,-48);ctx.lineTo(30,-62);ctx.lineTo(32,-50);ctx.fill();
   ctx.fillStyle=d.accent;
-  ctx.beginPath();ctx.arc(-16,-wf*.5,5,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(-16,wf*.5,5,0,Math.PI*2);ctx.fill();
-  // body
-  ctx.fillStyle='#212121';ctx.beginPath();ctx.ellipse(0,0,4,14,0,0,Math.PI*2);ctx.fill();
-  // antennae
-  ctx.strokeStyle='#212121';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(0,-14);ctx.quadraticCurveTo(-6,-24,-4,-28);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(0,-14);ctx.quadraticCurveTo(6,-24,4,-28);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(13,-49);ctx.lineTo(10,-58);ctx.lineTo(19,-51);ctx.fill();
+  ctx.beginPath();ctx.moveTo(25,-49);ctx.lineTo(29,-58);ctx.lineTo(31,-51);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(26,-42,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(27,-43,1,0,Math.PI*2);ctx.fill();
 }
 
-function drawBee(a,d){
-  const p=a.phase;
-  const wf=Math.sin(p*6)*12;
-  ctx.fillStyle='rgba(255,255,255,0.7)';
-  ctx.beginPath();ctx.ellipse(-8,wf-10,10,5,-.5,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(-8,-wf-10,10,5,.5,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,14,10,0,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle=d.accent;ctx.lineWidth=3;
-  for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(i*6,-10);ctx.lineTo(i*6,10);ctx.stroke();}
-  ctx.fillStyle=d.accent;ctx.beginPath();ctx.arc(10,0,5,0,Math.PI*2);ctx.fill(); // head
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(13,-1,2,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle=d.accent;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-14,0);ctx.lineTo(-20,-1);ctx.stroke(); // stinger
+// ── FENNEC FOX ──
+function drawFox(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*11;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=3.5;ctx.lineCap='round';
+  [[14,10,ls],[14,10,-ls],[-12,10,-ls],[-12,10,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.4,ly+18));
+  // big fluffy tail
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(-26,-2,14,9,-.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-32,-1,8,5,-.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,20,11,0,0,Math.PI*2);ctx.fill();
+  // neck + head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(12,-8);ctx.lineTo(15,-26);ctx.lineTo(5,-26);ctx.lineTo(3,-8);ctx.closePath();ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(14,-32,11,0,Math.PI*2);ctx.fill();
+  // pointed snout
+  ctx.beginPath();ctx.moveTo(16,-26);ctx.lineTo(28,-30);ctx.lineTo(16,-36);ctx.fill();
+  ctx.fillStyle='#e91e63';ctx.beginPath();ctx.arc(27,-30,2.5,0,Math.PI*2);ctx.fill();
+  // HUGE ears — what makes a fennec fox!
+  ctx.fillStyle=d.body;
+  ctx.beginPath();ctx.moveTo(6,-40);ctx.lineTo(0,-62);ctx.lineTo(16,-42);ctx.fill();
+  ctx.beginPath();ctx.moveTo(18,-40);ctx.lineTo(28,-62);ctx.lineTo(24,-42);ctx.fill();
+  ctx.fillStyle=d.accent;
+  ctx.beginPath();ctx.moveTo(7,-41);ctx.lineTo(2,-58);ctx.lineTo(14,-43);ctx.fill();
+  ctx.beginPath();ctx.moveTo(19,-41);ctx.lineTo(26,-58);ctx.lineTo(23,-43);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(20,-34,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(21,-35,1,0,Math.PI*2);ctx.fill();
 }
 
-function drawInsect(a,d){
-  const p=a.phase;
-  const ls=Math.sin(p*4)*6;
-  ctx.strokeStyle=d.body;ctx.lineWidth=2;ctx.lineCap='round';
-  for(let i=-2;i<=2;i++){if(i===0)continue;ctx.beginPath();ctx.moveTo(i*4,0);ctx.lineTo(i*8+ls,12);ctx.stroke();}
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,2,8,12,0,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(0,-10,7,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(-1,4,4,8,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(3,-12,2,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='#666';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,-17);ctx.lineTo(-4,-24);ctx.moveTo(0,-17);ctx.lineTo(4,-24);ctx.stroke();
+// ── GIRAFFE helper already above ──
+
+// ── FROG (tree frog) ──
+function drawFrog(a,d){
+  const p=a.phase,ext=Math.abs(Math.sin(p*3))*14;
+  // back legs (frog legs!)
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=5;ctx.lineCap='round';
+  legs(-12,10,-20-ext,22);legs(12,10,20+ext,22);
+  // toe pads
+  ctx.fillStyle=dk(d.body,10);ctx.beginPath();ctx.arc(-20-ext,22,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(20+ext,22,5,0,Math.PI*2);ctx.fill();
+  // small front arms
+  ctx.lineWidth=3;legs(14,2,18,12);
+  // wide flat body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,2,18,12,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(0,4,11,8,0,0,Math.PI*2);ctx.fill();
+  // wide head barely separate
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(14,-4,14,10,.1,0,Math.PI*2);ctx.fill();
+  // BIG BULGING EYES on top
+  ctx.fillStyle='#ffd700';ctx.beginPath();ctx.arc(8,-12,7,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(20,-12,7,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(8,-12,4.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(20,-12,4.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(9,-13,1.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(21,-13,1.5,0,Math.PI*2);ctx.fill();
+  // wide smile line
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(2,2);ctx.lineTo(24,0);ctx.stroke();
 }
 
-function drawSpider(a,d){
+// ── SLOTH ──
+function drawSloth(a,d){
   const p=a.phase;
-  ctx.strokeStyle=dk(d.body,10);ctx.lineWidth=2.5;ctx.lineCap='round';
-  for(let i=0;i<8;i++){
-    const ang=(i/8)*Math.PI*2,ls=Math.sin(p*3+i)*5;
-    ctx.beginPath();ctx.moveTo(Math.cos(ang)*10,Math.sin(ang)*6);ctx.lineTo(Math.cos(ang)*28+ls,Math.sin(ang)*20+ls);ctx.stroke();
+  // long arms hanging from above
+  ctx.strokeStyle=dk(d.body,15);ctx.lineWidth=6;ctx.lineCap='round';
+  legs(-10,-14,-22,-30);legs(10,-14,22,-30);
+  // claws gripping
+  ctx.fillStyle=dk(d.body,20);ctx.beginPath();ctx.arc(-22,-30,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(22,-30,5,0,Math.PI*2);ctx.fill();
+  // small short legs dangling
+  ctx.lineWidth=5;legs(-8,16,-6,30);legs(8,16,10,30);
+  // round body hanging
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,2,18,20,0,0,Math.PI*2);ctx.fill();
+  // round head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(0,-18,14,0,Math.PI*2);ctx.fill();
+  // dark face mask
+  ctx.fillStyle=dk(d.body,25);ctx.beginPath();ctx.ellipse(0,-18,9,10,0,0,Math.PI*2);ctx.fill();
+  // light eye rings + big slow eyes
+  ctx.fillStyle='#a1887f';ctx.beginPath();ctx.ellipse(-4,-18,5,4,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(4,-18,5,4,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(-4,-18,3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(4,-18,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3,-19,1,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(5,-19,1,0,Math.PI*2);ctx.fill();
+  // permanent smile
+  ctx.strokeStyle='#555';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-12,4,0,Math.PI);ctx.stroke();
+  // small round ears
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(-12,-28,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(12,-28,5,0,Math.PI*2);ctx.fill();
+}
+
+// ── LIZARD ──
+function drawLizard(a,d){
+  const p=a.phase,tailSwing=Math.sin(p*1.5)*16,ls=Math.sin(p*3)*8;
+  // sprawling splayed legs
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=3;ctx.lineCap='round';
+  legs(16,4,28,14+ls);legs(16,4,28,-6+ls);legs(-10,4,-22,14-ls);legs(-10,4,-22,-6-ls);
+  // swinging tail (very long)
+  ctx.strokeStyle=d.body;ctx.lineWidth=7;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(-36,0);ctx.quadraticCurveTo(-52,tailSwing,-64,tailSwing*1.3);ctx.stroke();
+  ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-60,tailSwing*1.2);ctx.lineTo(-76,tailSwing*1.5);ctx.stroke();
+  // flat body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(-4,0,34,9,0,0,Math.PI*2);ctx.fill();
+  // scale pattern
+  ctx.strokeStyle=d.accent;ctx.lineWidth=1.5;
+  for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(i*9,-9);ctx.lineTo(i*9,9);ctx.stroke();}
+  // triangular head + long snout
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(30,-8);ctx.lineTo(54,0);ctx.lineTo(30,8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#ffd700';ctx.beginPath();ctx.ellipse(36,-3,4,3.5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.ellipse(36,-3,1.5,3,0,0,Math.PI*2);ctx.fill();
+  // forked tongue
+  ctx.strokeStyle='#e53935';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(52,0);ctx.lineTo(58,-3);ctx.stroke();ctx.beginPath();ctx.moveTo(52,0);ctx.lineTo(58,3);ctx.stroke();
+}
+
+// ── COW ──
+function drawCow(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*10;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=5.5;ctx.lineCap='round';
+  [[18,12,ls],[18,12,-ls],[-18,12,-ls],[-18,12,ls]].forEach(([lx,ly,sw])=>{
+    legs(lx,ly,lx+sw*.3,ly+22);
+    ctx.fillStyle='#333';ctx.beginPath();ctx.ellipse(lx+sw*.3,ly+24,4,3,0,0,Math.PI*2);ctx.fill();
+  });
+  // udder
+  ctx.fillStyle='#ffb3ba';ctx.beginPath();ctx.ellipse(0,22,16,8,0,0,Math.PI*2);ctx.fill();
+  // body with patches
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,28,16,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;[[-12,-4,12,8],[10,-6,9,7],[-2,7,8,5]].forEach(([sx,sy,sw,sh])=>{ctx.beginPath();ctx.ellipse(sx,sy,sw,sh,.4,0,Math.PI*2);ctx.fill();});
+  // neck
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(18,-12);ctx.lineTo(22,-28);ctx.lineTo(10,-28);ctx.lineTo(6,-12);ctx.closePath();ctx.fill();
+  // head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(26,-34,13,10,.1,0,Math.PI*2);ctx.fill();
+  // big muzzle
+  ctx.fillStyle=dk(d.body,12);ctx.beginPath();ctx.ellipse(36,-32,9,7,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.body,28);ctx.beginPath();ctx.arc(33,-31,2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(38,-31,2,0,Math.PI*2);ctx.fill();
+  if(!d.ox){// udder marks only for cow, horns for both
+    ctx.strokeStyle='#ffcdd2';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,22);ctx.lineTo(0,30);ctx.stroke();
   }
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(0,-18,9,10,0,0,Math.PI*2);ctx.fill();
-  // scorpion tail
-  if(d.tail==='sting'){ctx.strokeStyle=d.accent;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,14);ctx.quadraticCurveTo(20,20,22,8);ctx.stroke();ctx.fillStyle=d.accent;ctx.beginPath();ctx.arc(22,8,4,0,Math.PI*2);ctx.fill();}
-  ctx.fillStyle='#e74c3c';ctx.beginPath();ctx.arc(-4,-20,2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(4,-20,2,0,Math.PI*2);ctx.fill();
+  // horns
+  ctx.strokeStyle=d.ox?'#b8a050':'#d4c56a';ctx.lineWidth=3.5;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(18,-42);ctx.lineTo(12,-52);ctx.stroke();ctx.beginPath();ctx.moveTo(26,-42);ctx.lineTo(32,-52);ctx.stroke();
+  // ears
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(16,-38,5,8,-.35,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(32,-36,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(33,-37,1,0,Math.PI*2);ctx.fill();
 }
 
-function drawSquid(a,d){
-  const p=a.phase;
-  const sc=1;
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,-6,10,18,0,0,Math.PI*2);ctx.fill();
-  for(let i=0;i<10;i++){
-    const tx=-14+i*(28/9),wave=Math.sin(p*2+i*.5)*8;
-    ctx.strokeStyle=d.body;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(tx,12);ctx.quadraticCurveTo(tx+wave,22,tx+wave*.5,32);ctx.stroke();
-  }
-  // two long tentacles
-  ctx.strokeStyle=d.accent;ctx.lineWidth=3;
-  ctx.beginPath();ctx.moveTo(-5,12);ctx.quadraticCurveTo(-12,32,-8,46);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(5,12);ctx.quadraticCurveTo(12,32,8,46);ctx.stroke();
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(-4,-14,3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(4,-14,3,0,Math.PI*2);ctx.fill();
+// ── GOAT ──
+function drawGoat(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*11;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4;ctx.lineCap='round';
+  [[16,10,ls],[16,10,-ls],[-14,10,-ls],[-14,10,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.4,ly+22));
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,22,14,0,0,Math.PI*2);ctx.fill();
+  // neck + head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(14,-10);ctx.lineTo(17,-28);ctx.lineTo(6,-28);ctx.lineTo(3,-10);ctx.closePath();ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(18,-34,10,9,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.body,12);ctx.beginPath();ctx.ellipse(26,-32,7,6,.1,0,Math.PI*2);ctx.fill();
+  // beard
+  ctx.fillStyle='#ccc';ctx.beginPath();ctx.ellipse(26,-24,4,8,.1,0,Math.PI*2);ctx.fill();
+  // curly horns
+  ctx.strokeStyle=d.accent;ctx.lineWidth=3;ctx.lineCap='round';
+  ctx.beginPath();ctx.arc(12,-42,6,Math.PI*.2,Math.PI*1.4);ctx.stroke();
+  ctx.beginPath();ctx.arc(22,-42,6,Math.PI*-.2,Math.PI*.8,true);ctx.stroke();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(10,-40,4,7,-.3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(24,-36,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(25,-37,1,0,Math.PI*2);ctx.fill();
 }
 
-function drawShrimp(a,d){
-  const p=a.phase;
-  const curve=Math.sin(p*2)*10;
-  ctx.strokeStyle=d.body;ctx.lineWidth=8;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(-16,0);ctx.quadraticCurveTo(0,-10+curve,16,0);ctx.stroke();
-  ctx.strokeStyle=d.accent;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-12,0);ctx.quadraticCurveTo(0,-6+curve,12,0);ctx.stroke();
-  ctx.strokeStyle=d.body;ctx.lineWidth=2;
-  for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(i*4,2);ctx.lineTo(i*5+2,10);ctx.stroke();}
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(18,0,6,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(21,-1,2,0,Math.PI*2);ctx.fill();
+// ── SHEEP ──
+function drawSheep(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*8;
+  ctx.strokeStyle='#555';ctx.lineWidth=3;ctx.lineCap='round';
+  [[14,14,ls],[14,14,-ls],[-14,14,-ls],[-14,14,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.2,ly+18));
+  // FLUFFY cloud-like body — overlapping circles!
+  ctx.fillStyle=d.body;
+  [[-10,0,17],[8,-4,16],[0,0,18],[-4,7,15],[14,2,15],[-18,3,14],[4,-8,15],[12,8,13]].forEach(([fx,fy,fr])=>{ctx.beginPath();ctx.arc(fx,fy,fr,0,Math.PI*2);ctx.fill();});
+  // dark woolly head separate from fluffy body
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(28,-10,10,12,.05,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.accent,15);ctx.beginPath();ctx.ellipse(35,-8,7,6,.1,0,Math.PI*2);ctx.fill();
+  // droopy ears
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(20,-18,5,9,-.3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(30,-18,5,9,.3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(32,-12,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(33,-13,1,0,Math.PI*2);ctx.fill();
 }
 
-function drawSnail(a,d){
-  const p=a.phase;
-  const ls=Math.sin(p*3)*5;
-  // shell (spiral)
+// ── LLAMA ──
+function drawLlama(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*11;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4;ctx.lineCap='round';
+  [[16,10,ls],[14,10,-ls],[-12,10,-ls],[-14,10,ls]].forEach(([lx,ly,sw])=>{
+    legs(lx,ly,lx+sw*.4,ly+28);
+    ctx.fillStyle='#888';ctx.beginPath();ctx.ellipse(lx+sw*.4,ly+30,4,3,0,0,Math.PI*2);ctx.fill();
+  });
+  // fluffy body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,22,15,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.28)';[[-10,0,8],[4,-5,9],[14,3,7],[-4,7,8]].forEach(([fx,fy,fr])=>{ctx.beginPath();ctx.arc(fx,fy,fr,0,Math.PI*2);ctx.fill();});
+  // LONG NECK — llama signature
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(14,-10);ctx.lineTo(18,-56);ctx.lineTo(6,-56);ctx.lineTo(2,-10);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.2)';for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(10,-14-i*13,7,0,Math.PI*2);ctx.fill();}
+  // small proud head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(16,-62,10,7,.15,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.body,10);ctx.beginPath();ctx.ellipse(24,-60,6,5,.2,0,Math.PI*2);ctx.fill();
+  // banana ears (upright + slightly curved)
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(10,-70,4,9,-.1,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(18,-70,4,9,.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(22,-63,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(23,-64,1,0,Math.PI*2);ctx.fill();
+}
+
+// ── MEERKAT ──
+function drawMeerkat(a,d){
+  const p=a.phase,sway=Math.sin(p*1.5)*4;
+  ctx.save();ctx.rotate(sway*Math.PI/180);
+  // back legs
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4;ctx.lineCap='round';
+  legs(-7,24,-9,40);legs(7,24,9,40);
+  // tail down behind
+  ctx.strokeStyle=dk(d.body,15);ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(0,26);ctx.lineTo(-3,48);ctx.stroke();
+  ctx.fillStyle=dk(d.body,20);ctx.beginPath();ctx.ellipse(-4,49,4,4,0,0,Math.PI*2);ctx.fill();
+  // upright body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,8,12,22,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(0,10,6,15,0,0,Math.PI*2);ctx.fill();
+  // small arms at sides
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=3;
+  legs(-12,-2,-16,10);legs(12,-2,16,10);
+  // round head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(0,-16,12,0,Math.PI*2);ctx.fill();
+  // dark eye patches — very distinctive meerkat feature!
+  ctx.fillStyle='#3e2723';ctx.beginPath();ctx.ellipse(-4,-17,5,4,.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(4,-17,5,4,-.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,-10,5,4,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(-4,-18,2.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(4,-18,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3,-19,1,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(5,-19,1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(-9,-22,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(9,-22,5,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+// ── BISON / WILDEBEEST / MUSK OX ──
+function drawBison(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*8;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=7;ctx.lineCap='round';
+  [[20,14,ls],[20,14,-ls],[-16,14,-ls],[-16,14,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.2,ly+18));
+  // front-heavy body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(-4,0,30,19,-.08,0,Math.PI*2);ctx.fill();
+  // BIG hump over shoulders
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(6,-22,18,20,0,0,Math.PI*2);ctx.fill();
+  // shaggy front mane
+  ctx.fillStyle=d.accent;
+  for(let i=0;i<9;i++){ctx.beginPath();ctx.arc(12-i*4,-8-i*2,8+i*.5,0,Math.PI*2);ctx.fill();}
+  // big heavy head
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(28,-8,20,16,.04,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(22,-10,14,12,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(28,-7,14,11,.04,0,Math.PI*2);ctx.fill();
+  // curved horns
+  ctx.strokeStyle='#5d4037';ctx.lineWidth=4;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(18,-22);ctx.quadraticCurveTo(6,-30,4,-20);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(30,-22);ctx.quadraticCurveTo(42,-30,44,-20);ctx.stroke();
+  // eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(36,-12,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(37,-13,1.2,0,Math.PI*2);ctx.fill();
+}
+
+// ── WARTHOG ──
+function drawWarthog(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*10;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=5;ctx.lineCap='round';
+  [[16,10,ls],[16,10,-ls],[-14,10,-ls],[-14,10,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.3,ly+16));
+  // tail straight up with tuft
+  ctx.strokeStyle=dk(d.body,15);ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-24,-2);ctx.lineTo(-26,-20);ctx.stroke();
+  ctx.fillStyle=dk(d.body,22);ctx.beginPath();ctx.arc(-26,-22,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,22,14,0,0,Math.PI*2);ctx.fill();
+  // large wide head with warts
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(28,2,20,16,.04,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.body,18);ctx.beginPath();ctx.arc(30,-6,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(36,-3,4,0,Math.PI*2);ctx.fill();
+  // flat wide snout
+  ctx.fillStyle=dk(d.body,12);ctx.beginPath();ctx.ellipse(44,4,11,8,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.body,28);ctx.beginPath();ctx.ellipse(41,4,3,2.5,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(47,4,3,2.5,0,0,Math.PI*2);ctx.fill();
+  // TUSKS — very distinctive warthog feature!
   ctx.strokeStyle=d.accent;ctx.lineWidth=5;ctx.lineCap='round';
-  ctx.beginPath();ctx.arc(-5,-8,14,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle=dk(d.accent,15);ctx.lineWidth=3;ctx.beginPath();ctx.arc(-5,-8,8,0,Math.PI*1.6);ctx.stroke();
-  // body
-  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(5,4,16,8,0,0,Math.PI*2);ctx.fill();
-  // antennae
-  ctx.strokeStyle=d.body;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(14,0);ctx.lineTo(20,-10);ctx.stroke();ctx.beginPath();ctx.moveTo(14,0);ctx.lineTo(18,-14);ctx.stroke();
-  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(20,-10,2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(18,-14,2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.moveTo(40,10);ctx.quadraticCurveTo(52,18,54,8);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(36,12);ctx.quadraticCurveTo(48,22,50,12);ctx.stroke();
+  // small ears
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(20,-14,5,9,-.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(30,-14,5,9,.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(34,-4,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(35,-5,1.2,0,Math.PI*2);ctx.fill();
+}
+
+// ── HEDGEHOG ──
+function drawHedgehog(a,d){
+  const p=a.phase,ls=Math.sin(p*4)*5;
+  ctx.strokeStyle='#8B6914';ctx.lineWidth=3;ctx.lineCap='round';
+  legs(10,10,10+ls,20);legs(-10,10,-10-ls,20);
+  // spines on back
+  for(let i=0;i<18;i++){
+    const ang=(i/17)*Math.PI-Math.PI*.9;
+    ctx.strokeStyle=d.accent;ctx.lineWidth=1.8;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(Math.cos(ang)*14,Math.sin(ang)*11);ctx.lineTo(Math.cos(ang)*22,Math.sin(ang)*18-3);ctx.stroke();
+  }
+  // round body
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,2,14,12,0,0,Math.PI*2);ctx.fill();
+  // lighter pointed face
+  ctx.fillStyle='#c49a6c';ctx.beginPath();ctx.ellipse(14,0,10,8,.1,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.moveTo(18,-5);ctx.lineTo(26,-2);ctx.lineTo(18,5);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(18,-4,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(19,-5,1.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#e91e63';ctx.beginPath();ctx.arc(25,-1,2.5,0,Math.PI*2);ctx.fill();
+}
+
+// ── HONEY BADGER ──
+function drawBadger(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*9;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=5;ctx.lineCap='round';
+  [[14,10,ls],[14,10,-ls],[-14,10,-ls],[-14,10,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.3,ly+14));
+  // body: white top, black bottom — distinctive two-tone!
+  ctx.fillStyle='#212121';ctx.beginPath();ctx.ellipse(0,4,22,13,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,-4,22,10,0,0,Math.PI*2);ctx.fill();
+  // neck + head
+  ctx.fillStyle='#212121';ctx.beginPath();ctx.moveTo(14,-8);ctx.lineTo(18,-24);ctx.lineTo(6,-24);ctx.lineTo(2,-8);ctx.closePath();ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(14,-8);ctx.lineTo(18,-20);ctx.lineTo(6,-20);ctx.lineTo(2,-8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#212121';ctx.beginPath();ctx.arc(18,-28,11,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(18,-30,10,6,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=dk(d.body,15);ctx.beginPath();ctx.ellipse(26,-28,6,5,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(24,-32,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(12,-36,4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(22,-36,4,0,Math.PI*2);ctx.fill();
+}
+
+// ── RACCOON ──
+function drawRaccoon(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*10;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4;ctx.lineCap='round';
+  [[14,10,ls],[14,10,-ls],[-14,10,-ls],[-14,10,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.4,ly+18));
+  // ringed tail
+  ctx.strokeStyle=d.body;ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(-22,-4);ctx.quadraticCurveTo(-36,4,-34,18);ctx.stroke();
+  ctx.strokeStyle=d.accent;ctx.lineWidth=4;
+  for(let i=0;i<4;i++){const t=i/4;const tx=-22-14*t,ty=-4+22*t;ctx.beginPath();ctx.arc(tx,ty,4,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,20,13,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(12,-10);ctx.lineTo(15,-26);ctx.lineTo(5,-26);ctx.lineTo(2,-10);ctx.closePath();ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(14,-32,12,0,Math.PI*2);ctx.fill();
+  // BANDIT MASK — unmistakable raccoon feature!
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.ellipse(14,-32,12,7,.05,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(10,-33,4,3,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(18,-33,4,3,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(10,-33,2.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(18,-33,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(11,-34,1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(22,-28,6,5,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(6,-42,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(18,-42,6,0,Math.PI*2);ctx.fill();
+}
+
+// ── BEAVER ──
+function drawBeaver(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*8;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=5;ctx.lineCap='round';
+  [[14,12,ls],[14,12,-ls],[-14,12,-ls],[-14,12,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.3,ly+15));
+  // FLAT paddle tail — very distinctive beaver feature!
+  ctx.fillStyle=dk(d.body,20);ctx.beginPath();ctx.ellipse(-28,8,18,9,.15,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=dk(d.body,30);ctx.lineWidth=1.5;
+  for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(-20+i*4,2);ctx.lineTo(-20+i*4,14);ctx.stroke();}
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,20,15,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(14,-10);ctx.lineTo(17,-24);ctx.lineTo(6,-24);ctx.lineTo(3,-10);ctx.closePath();ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(16,-30,12,0,Math.PI*2);ctx.fill();
+  // big front teeth — beaver signature!
+  ctx.fillStyle='#fffde7';ctx.beginPath();ctx.rect(12,-22,5,8);ctx.fill();ctx.beginPath();ctx.rect(19,-22,5,8);ctx.fill();
+  ctx.strokeStyle='#e67e22';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(17,-22);ctx.lineTo(17,-14);ctx.stroke();
+  ctx.fillStyle=dk(d.body,12);ctx.beginPath();ctx.ellipse(24,-28,6,5,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(8,-40,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(20,-40,6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(22,-32,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(23,-33,1,0,Math.PI*2);ctx.fill();
+}
+
+// ── OTTER ──
+function drawOtter(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*9;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4;ctx.lineCap='round';
+  [[14,10,ls],[14,10,-ls],[-12,10,-ls],[-12,10,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.35,ly+16));
+  // tapered tail
+  ctx.strokeStyle=d.body;ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-22,-2);ctx.lineTo(-36,-6);ctx.stroke();
+  ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-34,-6);ctx.lineTo(-44,-8);ctx.stroke();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,0,22,13,0,0,Math.PI*2);ctx.fill();
+  if(d.belly){ctx.fillStyle=d.belly;ctx.beginPath();ctx.ellipse(0,2,14,9,0,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(14,-10);ctx.lineTo(17,-24);ctx.lineTo(6,-24);ctx.lineTo(3,-10);ctx.closePath();ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(16,-30,12,0,Math.PI*2);ctx.fill();
+  if(d.belly){ctx.fillStyle=d.belly;ctx.beginPath();ctx.ellipse(18,-30,8,7,0,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle=dk(d.body,12);ctx.beginPath();ctx.ellipse(24,-28,6,5,.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(22,-33,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(23,-34,1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(8,-40,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(18,-40,5,0,Math.PI*2);ctx.fill();
+}
+
+// ── SQUIRREL ──
+function drawSquirrel(a,d){
+  const p=a.phase,ls=Math.sin(p*3)*8;
+  ctx.strokeStyle=dk(d.body,20);ctx.lineWidth=4;ctx.lineCap='round';
+  [[10,12,ls],[10,12,-ls],[-10,12,-ls],[-10,12,ls]].forEach(([lx,ly,sw])=>legs(lx,ly,lx+sw*.3,ly+16));
+  // HUGE bushy tail curving up and over body — unmistakable squirrel!
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.arc(-18,-20,20,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(-18,-20,13,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.accent;ctx.beginPath();ctx.arc(-6,-28,8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.ellipse(0,2,14,14,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(10,-10);ctx.lineTo(12,-24);ctx.lineTo(4,-24);ctx.lineTo(2,-10);ctx.closePath();ctx.fill();
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(10,-30,10,0,Math.PI*2);ctx.fill();
+  // pointy ears
+  ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(4,-38);ctx.lineTo(2,-50);ctx.lineTo(10,-38);ctx.fill();ctx.beginPath();ctx.moveTo(12,-38);ctx.lineTo(16,-50);ctx.lineTo(18,-38);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(14,-32,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(15,-33,1,0,Math.PI*2);ctx.fill();
+  // cheek pouch
+  ctx.fillStyle=dk(d.body,8);ctx.beginPath();ctx.ellipse(18,-28,5,4,.1,0,Math.PI*2);ctx.fill();
 }
 
 // ── Main dispatch ──
 function drawAnimalShape(a,isActive){
-  const d=AD[a.name]||{body:'#888',accent:'#666',shape:'quad'};
+  const d=AD[a.name]||{body:'#888',accent:'#666',shape:'bear'};
   ctx.save();ctx.translate(a.x,a.y);
   if(a.dir<0)ctx.scale(-1,1);
-  if(isActive){ctx.shadowColor='rgba(74,158,107,0.7)';ctx.shadowBlur=22;}
+  if(isActive){ctx.shadowColor='rgba(74,158,107,0.75)';ctx.shadowBlur=22;}
   switch(d.shape){
+    case'cat':      drawCat(a,d);break;
+    case'horse':    drawHorse(a,d);break;
+    case'bear':     drawBear(a,d);break;
+    case'elephant': drawElephant(a,d);break;
+    case'giraffe':  drawGiraffe(a,d);break;
+    case'croc':     drawCroc(a,d);break;
+    case'rhino':    drawRhino(a,d);break;
+    case'hippo':    drawHippo(a,d);break;
+    case'camel':    drawCamel(a,d);break;
+    case'pig':      drawPig(a,d);break;
+    case'rabbit':   drawRabbit(a,d);break;
+    case'gorilla':  drawGorilla(a,d);break;
+    case'deer':     drawDeer(a,d);break;
+    case'wolf':     drawWolf(a,d);break;
+    case'fox':      drawFox(a,d);break;
+    case'frog':     drawFrog(a,d);break;
+    case'sloth':    drawSloth(a,d);break;
+    case'lizard':   drawLizard(a,d);break;
+    case'cow':      drawCow(a,d);break;
+    case'goat':     drawGoat(a,d);break;
+    case'sheep':    drawSheep(a,d);break;
+    case'llama':    drawLlama(a,d);break;
+    case'meerkat':  drawMeerkat(a,d);break;
+    case'bison':    drawBison(a,d);break;
+    case'warthog':  drawWarthog(a,d);break;
+    case'hedgehog': drawHedgehog(a,d);break;
+    case'badger':   drawBadger(a,d);break;
+    case'raccoon':  drawRaccoon(a,d);break;
+    case'beaver':   drawBeaver(a,d);break;
+    case'otter':    drawOtter(a,d);break;
+    case'squirrel': drawSquirrel(a,d);break;
     case'fish':     drawFish(a,d);break;
     case'bird':     drawBird(a,d);break;
     case'bird_walk':drawBirdWalk(a,d);break;
@@ -713,14 +1124,14 @@ function drawAnimalShape(a,isActive){
     case'squid':    drawSquid(a,d);break;
     case'shrimp':   drawShrimp(a,d);break;
     case'snail':    drawSnail(a,d);break;
-    default:        drawQuadruped(a,d);break;
+    default:        drawBear(a,d);break;
   }
   ctx.restore();
   // name tag
   ctx.save();
   ctx.font='11px system-ui';ctx.textAlign='center';
   const nw=ctx.measureText(a.name).width;
-  const tagY=a.y+44;
+  const tagY=a.y+50;
   if(isActive){
     drawRoundRect(ctx,a.x-nw/2-8,tagY,nw+16,17,8);
     ctx.fillStyle='rgba(74,158,107,0.9)';ctx.fill();
@@ -735,7 +1146,6 @@ function drawAnimalShape(a,isActive){
     if(currentSpeech)drawBubble(currentSpeech,a.x,a.y,false);
   }
 }
-
 // ════════════════════════════════════════
 // ENVIRONMENT DRAWING
 // ════════════════════════════════════════
