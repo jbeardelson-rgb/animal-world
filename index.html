@@ -142,6 +142,7 @@ function createWorld(envId,envLabel){const w={id:worldIdCounter++,envId,envLabel
 const canvas=document.getElementById('canvas');
 const ctx=canvas.getContext('2d');
 let activeChatAnimal=null,currentSpeech='',userSpeech='';
+let snowflakes=[], jungleTrees=[];
 
 function resize(){const a=document.getElementById('game-area');canvas.width=a.clientWidth;canvas.height=a.clientHeight;jungleTrees=[];}
 window.addEventListener('resize',resize);
@@ -738,7 +739,6 @@ function drawAnimalShape(a,isActive){
 // ════════════════════════════════════════
 // ENVIRONMENT DRAWING
 // ════════════════════════════════════════
-let snowflakes=[];
 function initSnow(w,h){
   if(snowflakes.length)return;
   for(let i=0;i<80;i++)snowflakes.push({x:Math.random()*w,y:Math.random()*h,r:1+Math.random()*3,spd:.4+Math.random()*.8,drift:(Math.random()-.5)*.4});
@@ -751,7 +751,6 @@ function drawSnow(){
   snowflakes.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();});
 }
 
-let jungleTrees=[];
 function initJungleTrees(w,h,gy){
   if(jungleTrees.length)return;
   for(let i=0;i<5;i++){
