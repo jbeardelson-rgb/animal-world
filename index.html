@@ -198,11 +198,16 @@
 // ════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════
-const ENV_COLORS = {
-  jungle:  '#d4edda', ocean:  '#cce5ff', desert: '#fff3cd',
-  arctic:  '#d1ecf1', savanna:'#fef3c7', forest: '#d4edda',
-  farm:    '#fefce8',
+const ENV_SCENES = {
+  jungle:  { sky1:'#c0eda0', sky2:'#70b840', gnd1:'#4e8c28', gnd2:'#2a5a0e' },
+  ocean:   { sky1:'#90d8f8', sky2:'#3aabdc', gnd1:'#1870c8', gnd2:'#084888' },
+  desert:  { sky1:'#fde48c', sky2:'#f5a430', gnd1:'#e8c550', gnd2:'#b89020' },
+  arctic:  { sky1:'#e8f5ff', sky2:'#aad8f8', gnd1:'#cce8ff', gnd2:'#88b8dc' },
+  savanna: { sky1:'#fce07a', sky2:'#e8901e', gnd1:'#c8a030', gnd2:'#8c6818' },
+  forest:  { sky1:'#b0d898', sky2:'#609858', gnd1:'#3a6828', gnd2:'#1e4015' },
+  farm:    { sky1:'#90d4f8', sky2:'#5ab4ec', gnd1:'#7acc40', gnd2:'#4aa020' },
 };
+const CARD_W = 130, CARD_H = 108, CARD_R = 12;
 
 const BAD_WORDS = ['fuck','shit','bitch','ass','damn','crap','bastard','dick','cock','pussy','cunt','piss','hell','wtf','stfu','idiot','stupid','hate','kill','die','ugly'];
 
@@ -271,13 +276,16 @@ function drawBubble(text, ax, ay, isUser) {
   const bw = Math.max(...lines.map(l => ctx.measureText(l).width)) + pad * 2;
   const bh = lines.length * lh + pad * 2;
 
+  const cardEdgeBottom = ay + CARD_H / 2;
+  const cardEdgeTop    = ay - CARD_H / 2;
+
   let bx, by;
   if (isUser) {
     bx = ax - bw / 2;
-    by = ay + 54;
+    by = cardEdgeBottom + 8;
   } else {
     bx = ax - bw / 2;
-    by = ay - 54 - bh - tailH;
+    by = cardEdgeTop - bh - 8;
   }
 
   bx = Math.max(8, Math.min(canvas.width - bw - 8, bx));
@@ -302,11 +310,11 @@ function drawBubble(text, ax, ay, isUser) {
   ctx.beginPath();
   if (isUser) {
     ctx.moveTo(tailX - 8, by);
-    ctx.lineTo(tailX, ay + 50);
+    ctx.lineTo(tailX, cardEdgeBottom + 2);
     ctx.lineTo(tailX + 8, by);
   } else {
     ctx.moveTo(tailX - 8, by + bh);
-    ctx.lineTo(tailX, ay - 50);
+    ctx.lineTo(tailX, cardEdgeTop - 2);
     ctx.lineTo(tailX + 8, by + bh);
   }
   ctx.fillStyle = isUser ? '#4a9e6b' : '#ffffff';
@@ -319,50 +327,250 @@ function drawBubble(text, ax, ay, isUser) {
   lines.forEach((l, i) => ctx.fillText(l, bx + pad, by + pad + i * lh));
 }
 
-function drawAnimals() {
-  const bgColor = activeChatAnimal ? ENV_COLORS[activeChatAnimal.envId] : '#ffffff';
-  ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  canvasAnimals.forEach(a => {
-    const isActive = activeChatAnimal && activeChatAnimal.id === a.id;
-    const r = 38;
-
-    if (isActive) {
+// ── Card environment details (small) ──
+function drawCardEnvDetails(envId, x, y, w, h, gy) {
+  ctx.save();
+  switch (envId) {
+    case 'jungle':
+      ctx.fillStyle = 'rgba(50,110,15,0.45)';
+      [{lx:x+4,s:14},{lx:x+w-18,s:16},{lx:x+w/2-9,s:12}].forEach(({lx,s}) => {
+        ctx.beginPath(); ctx.ellipse(lx+s/2, gy-s*0.4, s*0.4, s*0.65, -0.4, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(lx+s/2+6, gy-s*0.3, s*0.35, s*0.6, 0.4, 0, Math.PI*2); ctx.fill();
+      });
+      break;
+    case 'ocean':
+      ctx.strokeStyle = 'rgba(255,255,255,0.38)'; ctx.lineWidth = 1.5;
+      for (let i = 0; i < 4; i++) {
+        const wy = gy + 5 + i * 8;
+        ctx.beginPath();
+        for (let wx = x; wx <= x+w; wx += 3) {
+          const wh = Math.sin((wx-x)*0.22 + i*1.5) * 2.5;
+          wx === x ? ctx.moveTo(wx, wy+wh) : ctx.lineTo(wx, wy+wh);
+        }
+        ctx.stroke();
+      }
+      break;
+    case 'desert':
+      ctx.fillStyle = 'rgba(200,165,40,0.35)';
       ctx.beginPath();
-      ctx.arc(a.x, a.y, r + 8, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(74,158,107,0.18)';
-      ctx.fill();
-    }
+      ctx.moveTo(x, gy+h*0.1); ctx.quadraticCurveTo(x+w*0.3, gy-h*0.12, x+w*0.5, gy+h*0.05);
+      ctx.quadraticCurveTo(x+w*0.72, gy+h*0.18, x+w, gy+h*0.04);
+      ctx.lineTo(x+w, gy); ctx.lineTo(x, gy); ctx.closePath(); ctx.fill();
+      break;
+    case 'arctic':
+      ctx.fillStyle = 'rgba(255,255,255,0.68)';
+      for (let i = 0; i < 10; i++) {
+        ctx.beginPath(); ctx.arc(x+8+(i*(w-16)/9), y+6+(i%3)*9, 1.5+(i%3)*0.5, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(180,220,255,0.45)'; ctx.lineWidth = 1.5;
+      [gy+8, gy+18].forEach(iy => { ctx.beginPath(); ctx.moveTo(x,iy); ctx.lineTo(x+w,iy); ctx.stroke(); });
+      break;
+    case 'savanna':
+      ctx.strokeStyle = 'rgba(165,125,20,0.45)'; ctx.lineWidth = 1.5;
+      for (let i = 0; i < 14; i++) {
+        const gx = x+5+i*(w-10)/13;
+        ctx.beginPath(); ctx.moveTo(gx,gy+3); ctx.lineTo(gx-3,gy-9); ctx.moveTo(gx,gy+3); ctx.lineTo(gx+3,gy-11); ctx.stroke();
+      }
+      break;
+    case 'forest':
+      [[x+2,20,8],[x+w-10,17,7]].forEach(([tx,th,tw]) => {
+        ctx.fillStyle = 'rgba(55,35,15,0.35)'; ctx.fillRect(tx, gy-th, tw, th+5);
+        ctx.fillStyle = 'rgba(35,75,25,0.4)'; ctx.beginPath(); ctx.arc(tx+tw/2, gy-th, tw+6, 0, Math.PI*2); ctx.fill();
+      });
+      break;
+    case 'farm':
+      ctx.strokeStyle = 'rgba(175,135,70,0.55)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(x, gy+5); ctx.lineTo(x+w, gy+5); ctx.stroke();
+      for (let i = 0; i < 5; i++) {
+        const fx = x+4+i*(w-8)/4;
+        ctx.beginPath(); ctx.moveTo(fx, gy-8); ctx.lineTo(fx, gy+9); ctx.stroke();
+      }
+      ctx.fillStyle = '#ff8888';
+      [{fx:x+20},{fx:x+w*0.5},{fx:x+w-22}].forEach(({fx}) => { ctx.beginPath(); ctx.arc(fx, gy+2, 3, 0, Math.PI*2); ctx.fill(); });
+      break;
+  }
+  ctx.restore();
+}
 
-    ctx.beginPath();
-    ctx.arc(a.x, a.y, r, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
-    ctx.strokeStyle = isActive ? '#4a9e6b' : '#ddddd8';
-    ctx.lineWidth = isActive ? 2.5 : 1.5;
-    ctx.stroke();
+// ── Full-canvas environment details ──
+function drawFullEnvDetails(envId, w, h, gy) {
+  ctx.save();
+  switch (envId) {
+    case 'jungle':
+      ctx.fillStyle = 'rgba(45,105,15,0.3)';
+      for (let i = 0; i < 8; i++) {
+        const lx = 20+i*(w/7.5), s = 32+i%3*12;
+        ctx.beginPath(); ctx.ellipse(lx, gy-s*0.4, s*0.38, s*0.65, -0.4+i*0.15, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(lx+s*0.6, gy-s*0.3, s*0.32, s*0.58, 0.3-i*0.1, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(55,110,20,0.2)'; ctx.lineWidth = 4;
+      for (let i = 0; i < 5; i++) {
+        const vx = w*0.08+i*(w*0.22);
+        ctx.beginPath(); ctx.moveTo(vx,0); ctx.quadraticCurveTo(vx+25,h*0.28,vx-12,h*0.5); ctx.stroke();
+      }
+      break;
+    case 'ocean':
+      for (let row = 0; row < 6; row++) {
+        const wy = gy+12+row*((h-gy-10)/6);
+        ctx.strokeStyle = `rgba(255,255,255,${0.22-row*0.025})`; ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let wx = 0; wx <= w; wx += 5) {
+          const wh = Math.sin(wx*0.035+row*1.2)*9; wx===0?ctx.moveTo(wx,wy+wh):ctx.lineTo(wx,wy+wh);
+        }
+        ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      for (let i = 0; i < 18; i++) {
+        ctx.beginPath(); ctx.arc((i*191+50)%w, gy+20+(i*97)%(h-gy-25), 2+(i%3)*0.8, 0, Math.PI*2); ctx.fill();
+      }
+      break;
+    case 'desert':
+      ctx.fillStyle = 'rgba(205,170,45,0.3)';
+      ctx.beginPath(); ctx.moveTo(0,gy+25);
+      ctx.quadraticCurveTo(w*0.22,gy-50,w*0.42,gy+12); ctx.quadraticCurveTo(w*0.62,gy+55,w*0.78,gy+8);
+      ctx.quadraticCurveTo(w*0.9,gy-35,w,gy+18); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,195,90,0.12)'; ctx.lineWidth = 1.5;
+      for (let i = 0; i < 8; i++) {
+        const sy = gy*0.3+i*gy*0.085;
+        ctx.beginPath();
+        for (let sx = 0; sx <= w; sx += 6) {
+          const sh = Math.sin(sx*0.055+i*0.9)*5; sx===0?ctx.moveTo(sx,sy+sh):ctx.lineTo(sx,sy+sh);
+        }
+        ctx.stroke();
+      }
+      break;
+    case 'arctic':
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      for (let i = 0; i < 50; i++) {
+        ctx.beginPath(); ctx.arc((i*191+30)%w, (i*113+10)%(gy*0.9), 0.8+(i%4)*0.6, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(155,205,240,0.38)'; ctx.lineWidth = 1.5;
+      for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.moveTo(0,gy+14+i*20); ctx.lineTo(w,gy+14+i*20); ctx.stroke(); }
+      ctx.fillStyle = 'rgba(200,230,255,0.35)';
+      [{px:w*0.1,pw:60,ph:35},{px:w*0.7,pw:80,ph:45},{px:w*0.45,pw:50,ph:28}].forEach(({px,pw,ph}) => {
+        ctx.beginPath(); ctx.moveTo(px-pw/2,gy); ctx.lineTo(px,gy-ph); ctx.lineTo(px+pw/2,gy); ctx.closePath(); ctx.fill();
+      });
+      break;
+    case 'savanna':
+      ctx.strokeStyle = 'rgba(155,120,18,0.3)'; ctx.lineWidth = 1.5;
+      for (let i = 0; i < 35; i++) {
+        const gx = (i*137)%w;
+        ctx.beginPath(); ctx.moveTo(gx,gy+5); ctx.lineTo(gx-6,gy-18); ctx.moveTo(gx,gy+5); ctx.lineTo(gx+6,gy-22); ctx.moveTo(gx,gy+5); ctx.lineTo(gx,gy-14); ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(75,45,18,0.28)'; ctx.fillRect(w*0.84, gy-70, 10, 75);
+      ctx.fillStyle = 'rgba(55,85,28,0.28)'; ctx.beginPath(); ctx.ellipse(w*0.84+5, gy-72, 42, 14, 0, 0, Math.PI*2); ctx.fill();
+      break;
+    case 'forest':
+      for (let i = 0; i < 7; i++) {
+        const tx = 25+i*(w/6.2), th = 80+(i%3)*35, tw = 14+(i%2)*4;
+        ctx.fillStyle = 'rgba(55,35,15,0.22)'; ctx.fillRect(tx-tw/2, gy-th, tw, th+8);
+        ctx.fillStyle = 'rgba(35,75,28,0.27)'; ctx.beginPath(); ctx.arc(tx, gy-th, 30+(i%2)*12, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(35,72,22,0.25)';
+      for (let i = 0; i < 9; i++) { ctx.beginPath(); ctx.ellipse(i*(w/8), gy+10, 28, 14, 0, 0, Math.PI*2); ctx.fill(); }
+      break;
+    case 'farm':
+      ctx.strokeStyle = 'rgba(175,135,70,0.45)'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(0,gy+14); ctx.lineTo(w,gy+14); ctx.stroke();
+      ctx.lineWidth = 2;
+      for (let i = 0; i <= Math.ceil(w/42)+1; i++) {
+        const fx = i*42; ctx.beginPath(); ctx.moveTo(fx,gy-18); ctx.lineTo(fx,gy+20); ctx.stroke();
+      }
+      ctx.fillStyle = '#ff8080';
+      for (let i = 0; i < 20; i++) { ctx.beginPath(); ctx.arc((i*157+20)%w, gy+6+(i%3)*10, 3, 0, Math.PI*2); ctx.fill(); }
+      break;
+  }
+  ctx.restore();
+}
 
-    ctx.font = '30px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(a.emoji, a.x, a.y);
+// ── Full canvas background ──
+function drawFullBackground(envId) {
+  const w = canvas.width, h = canvas.height;
+  const sc = ENV_SCENES[envId] || ENV_SCENES.forest;
+  const gy = h * 0.62;
 
-    ctx.font = '11px system-ui';
-    ctx.fillStyle = isActive ? '#2e7d50' : '#777';
-    ctx.textBaseline = 'top';
-    ctx.fillText(a.name, a.x, a.y + r + 5);
-    if (!isActive) {
-      ctx.font = '10px system-ui';
-      ctx.fillStyle = '#bbb';
-      ctx.fillText('tap to chat', a.x, a.y + r + 20);
-    }
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, gy);
+  skyGrad.addColorStop(0, sc.sky1); skyGrad.addColorStop(1, sc.sky2);
+  ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, w, gy);
 
-    if (isActive) {
-      if (userSpeech) drawBubble(userSpeech, a.x, a.y, true);
-      if (currentSpeech) drawBubble(currentSpeech, a.x, a.y, false);
-    }
-  });
+  const gndGrad = ctx.createLinearGradient(0, gy, 0, h);
+  gndGrad.addColorStop(0, sc.gnd1); gndGrad.addColorStop(1, sc.gnd2);
+  ctx.fillStyle = gndGrad; ctx.fillRect(0, gy, w, h - gy);
+
+  drawFullEnvDetails(envId, w, h, gy);
+}
+
+// ── Per-animal habitat card ──
+function drawHabitatCard(a, isActive) {
+  const sc = ENV_SCENES[a.envId] || ENV_SCENES.farm;
+  const x = a.x - CARD_W / 2, y = a.y - CARD_H / 2;
+  const gy = y + CARD_H * 0.58;
+
+  ctx.save();
+  if (isActive) { ctx.shadowColor = 'rgba(74,158,107,0.45)'; ctx.shadowBlur = 24; }
+  drawRoundRect(ctx, x, y, CARD_W, CARD_H, CARD_R);
+  ctx.clip();
+
+  const skyGrad = ctx.createLinearGradient(x, y, x, gy);
+  skyGrad.addColorStop(0, sc.sky1); skyGrad.addColorStop(1, sc.sky2);
+  ctx.fillStyle = skyGrad; ctx.fillRect(x, y, CARD_W, gy - y);
+
+  const gndGrad = ctx.createLinearGradient(x, gy, x, y + CARD_H);
+  gndGrad.addColorStop(0, sc.gnd1); gndGrad.addColorStop(1, sc.gnd2);
+  ctx.fillStyle = gndGrad; ctx.fillRect(x, gy, CARD_W, y + CARD_H - gy);
+
+  drawCardEnvDetails(a.envId, x, y, CARD_W, CARD_H, gy);
+  ctx.restore();
+
+  // Border
+  ctx.save();
+  drawRoundRect(ctx, x, y, CARD_W, CARD_H, CARD_R);
+  ctx.strokeStyle = isActive ? '#4a9e6b' : 'rgba(0,0,0,0.16)';
+  ctx.lineWidth = isActive ? 2.5 : 1.5;
+  ctx.stroke();
+  ctx.restore();
+
+  // Ground shadow under animal
+  ctx.save();
+  ctx.beginPath(); ctx.ellipse(a.x, gy + 3, 20, 6, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fill();
+  ctx.restore();
+
+  // Animal emoji — large, standing on ground
+  ctx.save();
+  ctx.font = '56px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(a.emoji, a.x, gy + 5);
+  ctx.restore();
+
+  // Name bar
+  ctx.save();
+  ctx.fillStyle = isActive ? 'rgba(74,158,107,0.88)' : 'rgba(0,0,0,0.32)';
+  drawRoundRect(ctx, x + 6, y + CARD_H - 22, CARD_W - 12, 17, 8);
+  ctx.fill();
+  ctx.font = isActive ? 'bold 10px system-ui' : '10px system-ui';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(isActive ? a.name : a.name + '  ·  tap to chat', a.x, y + CARD_H - 13);
+  ctx.restore();
+
+  // Speech bubbles
+  if (isActive) {
+    if (userSpeech) drawBubble(userSpeech, a.x, a.y, true);
+    if (currentSpeech) drawBubble(currentSpeech, a.x, a.y, false);
+  }
+}
+
+function drawAnimals() {
+  if (activeChatAnimal) {
+    drawFullBackground(activeChatAnimal.envId);
+  } else {
+    ctx.fillStyle = '#f0ede6';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  canvasAnimals.forEach(a => drawHabitatCard(a, activeChatAnimal && activeChatAnimal.id === a.id));
 }
 
 function loop() { drawAnimals(); requestAnimationFrame(loop); }
@@ -413,8 +621,8 @@ canvas.addEventListener('click', e => {
   const my = (e.clientY - rect.top)  * scaleY;
 
   for (const a of canvasAnimals) {
-    const dx = mx - a.x, dy = my - a.y;
-    if (Math.sqrt(dx*dx + dy*dy) < 44) {
+    if (mx >= a.x - CARD_W/2 && mx <= a.x + CARD_W/2 &&
+        my >= a.y - CARD_H/2 && my <= a.y + CARD_H/2) {
       openChat(a);
       return;
     }
