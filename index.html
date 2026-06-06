@@ -208,7 +208,7 @@ const BAD_WORDS = ['fuck','shit','bitch','ass','damn','crap','bastard','dick','c
 
 function hasBadWord(text) {
   const lower = text.toLowerCase();
-  return BAD_WORDS.some(w => lower.includes(w));
+  return BAD_WORDS.some(w => new RegExp('\\b' + w + '\\b').test(lower));
 }
 
 // ════════════════════════════════════════
