@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         'Authorization': 'Bearer ' + process.env.GROQ_API_KEY,
       },
       body: JSON.stringify({
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         max_tokens: 200,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -28,13 +28,10 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    if (!response.ok) {
-      return res.status(500).json({ groqStatus: response.status, groqError: data });
-    }
     const reply = data.choices[0].message.content;
     res.status(200).json({ reply });
 
   } catch (err) {
-    res.status(500).json({ error: err?.message || String(err) });
+    res.status(500).json({ error: 'Something went wrong' });
   }
 }
