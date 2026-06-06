@@ -207,7 +207,15 @@ const ENV_SCENES = {
   forest:  { sky1:'#b0d898', sky2:'#609858', gnd1:'#3a6828', gnd2:'#1e4015' },
   farm:    { sky1:'#90d4f8', sky2:'#5ab4ec', gnd1:'#7acc40', gnd2:'#4aa020' },
 };
-const CARD_W = 130, CARD_H = 108, CARD_R = 12;
+// ── World system ──
+let worlds = [], activeWorldId = null, worldIdCounter = 0, animalIdCounter = 0, pendingNewWorld = null;
+const ENV_ICONS = { jungle:'🌿', ocean:'🌊', desert:'🏜️', arctic:'🧊', savanna:'🦁', forest:'🌲', farm:'🌾' };
+const FLY_NAMES  = new Set(['Macaw','Butterfly','Snowy Owl','Snow Bunting','Dove','Crow','Bee','Vulture','Sec. Bird','Swan','Duck','Rooster','Chicken','Turkey','Flamingo','Peacock']);
+const SWIM_NAMES = new Set(['Shark','Dolphin','Octopus','Whale','Clownfish','Jellyfish','Squid','Shrimp','Blowfish','Tuna','Narwhal','Seal','Otter']);
+function getMoveType(name) { return FLY_NAMES.has(name) ? 'fly' : SWIM_NAMES.has(name) ? 'swim' : 'walk'; }
+function getActiveWorld() { return worlds.find(w => w.id === activeWorldId) || null; }
+function createWorld(envId, envLabel) { const w={id:worldIdCounter++,envId,envLabel,animals:[]}; worlds.push(w); activeWorldId=w.id; return w; }
+const TAB_H=40, TAB_W=90, TAB_GAP=6, TAB_MARGIN=12, NEW_BTN_W=46;
 
 const BAD_WORDS = ['fuck','shit','bitch','ass','damn','crap','bastard','dick','cock','pussy','cunt','piss','hell','wtf','stfu','idiot','stupid','hate','kill','die','ugly'];
 
@@ -234,12 +242,7 @@ resize();
 // ════════════════════════════════════════
 // ANIMALS ON CANVAS
 // ════════════════════════════════════════
-let canvasAnimals = [];
-let animalIdCounter = 0;
-
-let currentSpeech = '';
-let userSpeech    = '';
-let userSpeechTimer = null;
+let currentSpeech = '', userSpeech = '';
 
 function wrapText(ctx, text, maxW) {
   const words = text.split(' ');
@@ -276,16 +279,14 @@ function drawBubble(text, ax, ay, isUser) {
   const bw = Math.max(...lines.map(l => ctx.measureText(l).width)) + pad * 2;
   const bh = lines.length * lh + pad * 2;
 
-  const cardEdgeBottom = ay + CARD_H / 2;
-  const cardEdgeTop    = ay - CARD_H / 2;
-
+  const emojiR = 30;
   let bx, by;
   if (isUser) {
     bx = ax - bw / 2;
-    by = cardEdgeBottom + 8;
+    by = ay + emojiR + 8;
   } else {
     bx = ax - bw / 2;
-    by = cardEdgeTop - bh - 8;
+    by = ay - emojiR - bh - 8;
   }
 
   bx = Math.max(8, Math.min(canvas.width - bw - 8, bx));
@@ -310,11 +311,11 @@ function drawBubble(text, ax, ay, isUser) {
   ctx.beginPath();
   if (isUser) {
     ctx.moveTo(tailX - 8, by);
-    ctx.lineTo(tailX, cardEdgeBottom + 2);
+    ctx.lineTo(tailX, ay + emojiR + 2);
     ctx.lineTo(tailX + 8, by);
   } else {
     ctx.moveTo(tailX - 8, by + bh);
-    ctx.lineTo(tailX, cardEdgeTop - 2);
+    ctx.lineTo(tailX, ay - emojiR - 2);
     ctx.lineTo(tailX + 8, by + bh);
   }
   ctx.fillStyle = isUser ? '#4a9e6b' : '#ffffff';
@@ -327,7 +328,7 @@ function drawBubble(text, ax, ay, isUser) {
   lines.forEach((l, i) => ctx.fillText(l, bx + pad, by + pad + i * lh));
 }
 
-// ── Card environment details (small) ──
+// ── (card details removed — animals now roam freely) ──
 function drawCardEnvDetails(envId, x, y, w, h, gy) {
   ctx.save();
   switch (envId) {
@@ -500,77 +501,132 @@ function drawFullBackground(envId) {
   drawFullEnvDetails(envId, w, h, gy);
 }
 
-// ── Per-animal habitat card ──
-function drawHabitatCard(a, isActive) {
-  const sc = ENV_SCENES[a.envId] || ENV_SCENES.farm;
-  const x = a.x - CARD_W / 2, y = a.y - CARD_H / 2;
-  const gy = y + CARD_H * 0.58;
+// ════════════════════════════════════════
+// ANIMAL MOVEMENT + FREE DRAWING
+// ════════════════════════════════════════
+function updateAnimals(world) {
+  const cw = canvas.width, ch = canvas.height;
+  const groundY = ch * 0.62 - 28;
+  const skyMin = ch * 0.08, skyMax = ch * 0.46;
+  const waterMin = ch * 0.65, waterMax = ch * 0.87;
+  world.animals.forEach(a => {
+    if (a.chatting) return;
+    a.phase += 0.025;
+    a.x += a.vx;
+    switch (a.moveType) {
+      case 'fly':
+        a.y = (skyMin + skyMax) / 2 + Math.sin(a.phase) * (skyMax - skyMin) * 0.38;
+        break;
+      case 'swim':
+        a.y = (waterMin + waterMax) / 2 + Math.sin(a.phase * 0.7) * 26;
+        break;
+      default:
+        a.y = groundY + Math.sin(a.phase * 3) * 5;
+    }
+    const margin = 65;
+    if (a.x < margin) { a.x = margin; a.vx = Math.abs(a.vx); a.dir = 1; }
+    if (a.x > cw - margin) { a.x = cw - margin; a.vx = -Math.abs(a.vx); a.dir = -1; }
+  });
+}
 
+function drawAnimalFree(a, isActive) {
+  // Emoji (flipped for direction)
   ctx.save();
-  if (isActive) { ctx.shadowColor = 'rgba(74,158,107,0.45)'; ctx.shadowBlur = 24; }
-  drawRoundRect(ctx, x, y, CARD_W, CARD_H, CARD_R);
-  ctx.clip();
-
-  const skyGrad = ctx.createLinearGradient(x, y, x, gy);
-  skyGrad.addColorStop(0, sc.sky1); skyGrad.addColorStop(1, sc.sky2);
-  ctx.fillStyle = skyGrad; ctx.fillRect(x, y, CARD_W, gy - y);
-
-  const gndGrad = ctx.createLinearGradient(x, gy, x, y + CARD_H);
-  gndGrad.addColorStop(0, sc.gnd1); gndGrad.addColorStop(1, sc.gnd2);
-  ctx.fillStyle = gndGrad; ctx.fillRect(x, gy, CARD_W, y + CARD_H - gy);
-
-  drawCardEnvDetails(a.envId, x, y, CARD_W, CARD_H, gy);
-  ctx.restore();
-
-  // Border
-  ctx.save();
-  drawRoundRect(ctx, x, y, CARD_W, CARD_H, CARD_R);
-  ctx.strokeStyle = isActive ? '#4a9e6b' : 'rgba(0,0,0,0.16)';
-  ctx.lineWidth = isActive ? 2.5 : 1.5;
-  ctx.stroke();
-  ctx.restore();
-
-  // Ground shadow under animal
-  ctx.save();
-  ctx.beginPath(); ctx.ellipse(a.x, gy + 3, 20, 6, 0, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fill();
-  ctx.restore();
-
-  // Animal emoji — large, standing on ground
-  ctx.save();
-  ctx.font = '56px serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'bottom';
-  ctx.fillText(a.emoji, a.x, gy + 5);
-  ctx.restore();
-
-  // Name bar
-  ctx.save();
-  ctx.fillStyle = isActive ? 'rgba(74,158,107,0.88)' : 'rgba(0,0,0,0.32)';
-  drawRoundRect(ctx, x + 6, y + CARD_H - 22, CARD_W - 12, 17, 8);
-  ctx.fill();
-  ctx.font = isActive ? 'bold 10px system-ui' : '10px system-ui';
-  ctx.fillStyle = '#fff';
+  ctx.translate(a.x, a.y);
+  if (a.dir < 0) ctx.scale(-1, 1);
+  if (isActive) { ctx.shadowColor = 'rgba(74,158,107,0.7)'; ctx.shadowBlur = 22; }
+  ctx.font = '52px serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(isActive ? a.name : a.name + '  ·  tap to chat', a.x, y + CARD_H - 13);
+  ctx.fillText(a.emoji, 0, 0);
   ctx.restore();
 
-  // Speech bubbles
+  // Name tag (always upright)
+  ctx.save();
+  ctx.font = '11px system-ui';
+  ctx.textAlign = 'center';
+  const nw = ctx.measureText(a.name).width;
   if (isActive) {
-    if (userSpeech) drawBubble(userSpeech, a.x, a.y, true);
+    drawRoundRect(ctx, a.x - nw/2 - 8, a.y + 30, nw + 16, 17, 8);
+    ctx.fillStyle = 'rgba(74,158,107,0.9)'; ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle';
+    ctx.fillText(a.name, a.x, a.y + 38);
+  } else {
+    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.textBaseline = 'top';
+    ctx.strokeText(a.name, a.x, a.y + 30);
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.fillText(a.name, a.x, a.y + 30);
+  }
+  ctx.restore();
+
+  if (isActive) {
+    if (userSpeech)   drawBubble(userSpeech,   a.x, a.y, true);
     if (currentSpeech) drawBubble(currentSpeech, a.x, a.y, false);
   }
 }
 
+function drawWorldTabs() {
+  const ch = canvas.height;
+  worlds.forEach((world, i) => {
+    const tx = TAB_MARGIN + i * (TAB_W + TAB_GAP);
+    const ty = ch - TAB_H - TAB_MARGIN;
+    const isActive = world.id === activeWorldId;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.28)'; ctx.shadowBlur = 8;
+    drawRoundRect(ctx, tx, ty, TAB_W, TAB_H, 10);
+    ctx.fillStyle = isActive ? 'rgba(74,158,107,0.94)' : 'rgba(0,0,0,0.52)';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.font = '20px serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(ENV_ICONS[world.envId] || '🌍', tx + 8, ty + TAB_H / 2);
+    ctx.font = '10px system-ui'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
+    const label = world.envLabel || 'New Group';
+    ctx.fillText(label.length > 9 ? label.slice(0, 9) : label, tx + 32, ty + TAB_H / 2);
+    ctx.restore();
+  });
+  // "New Group" button
+  const bx = TAB_MARGIN + worlds.length * (TAB_W + TAB_GAP);
+  const by = ch - TAB_H - TAB_MARGIN;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.2)'; ctx.shadowBlur = 6;
+  drawRoundRect(ctx, bx, by, NEW_BTN_W, TAB_H, 10);
+  ctx.fillStyle = pendingNewWorld ? 'rgba(74,158,107,0.9)' : 'rgba(255,255,255,0.22)';
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.font = 'bold 20px system-ui'; ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('+', bx + NEW_BTN_W / 2, by + TAB_H / 2);
+  ctx.restore();
+}
+
 function drawAnimals() {
-  if (activeChatAnimal) {
-    drawFullBackground(activeChatAnimal.envId);
-  } else {
-    ctx.fillStyle = '#f0ede6';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const world = getActiveWorld();
+  if (!world) {
+    ctx.fillStyle = '#f0ede6'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.font = 'bold 18px system-ui'; ctx.fillStyle = '#aaa';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Drag an animal to get started!', canvas.width / 2, canvas.height / 2 - 14);
+    ctx.font = '13px system-ui'; ctx.fillStyle = '#bbb';
+    ctx.fillText('Each environment gets its own world', canvas.width / 2, canvas.height / 2 + 14);
+    ctx.restore();
+    drawWorldTabs();
+    return;
   }
-  canvasAnimals.forEach(a => drawHabitatCard(a, activeChatAnimal && activeChatAnimal.id === a.id));
+  if (world.envId) {
+    drawFullBackground(world.envId);
+  } else {
+    ctx.fillStyle = '#c8c4be'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.font = 'bold 16px system-ui'; ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('New group — drop an animal here!', canvas.width / 2, canvas.height / 2);
+    ctx.restore();
+  }
+  updateAnimals(world);
+  world.animals.forEach(a => drawAnimalFree(a, activeChatAnimal && activeChatAnimal.id === a.id));
+  drawWorldTabs();
 }
 
 function loop() { drawAnimals(); requestAnimationFrame(loop); }
@@ -594,18 +650,41 @@ gameArea.addEventListener('drop', e => {
   e.preventDefault();
   dropHint.classList.remove('active');
   if (!dragPayload) return;
-  const rect   = canvas.getBoundingClientRect();
-  const scaleX = canvas.width  / rect.width;
-  const scaleY = canvas.height / rect.height;
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top)  * scaleY;
-  canvasAnimals.push({
+  const rect  = canvas.getBoundingClientRect();
+  const dropX = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const cw = canvas.width, ch = canvas.height;
+
+  // Find or create matching world
+  let world = getActiveWorld();
+  if (!world) {
+    world = createWorld(dragPayload.envId, dragPayload.envLabel);
+  } else if (world.envId === null) {
+    // blank pending world — assign env from first animal
+    world.envId = dragPayload.envId;
+    world.envLabel = dragPayload.envLabel;
+    pendingNewWorld = null;
+  } else if (world.envId !== dragPayload.envId) {
+    // Different env — find existing world for this env or create new one
+    let existing = worlds.find(w => w.envId === dragPayload.envId);
+    if (existing) { activeWorldId = existing.id; world = existing; }
+    else { world = createWorld(dragPayload.envId, dragPayload.envLabel); }
+  }
+
+  const moveType = getMoveType(dragPayload.name);
+  let startY;
+  if (moveType === 'fly')       startY = ch * 0.22 + Math.random() * ch * 0.18;
+  else if (moveType === 'swim') startY = ch * 0.68 + Math.random() * ch * 0.14;
+  else                          startY = ch * 0.62 - 26;
+
+  const spd = 0.7 + Math.random() * 1.3;
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  world.animals.push({
     id: animalIdCounter++,
-    x, y,
-    emoji:    dragPayload.emoji,
-    name:     dragPayload.name,
-    envId:    dragPayload.envId,
-    envLabel: dragPayload.envLabel,
+    emoji: dragPayload.emoji, name: dragPayload.name,
+    envId: dragPayload.envId, envLabel: dragPayload.envLabel,
+    x: Math.max(80, Math.min(cw - 80, dropX)), y: startY,
+    vx: spd * dir, phase: Math.random() * Math.PI * 2,
+    moveType, dir, chatting: false,
   });
   dragPayload = null;
 });
@@ -614,18 +693,54 @@ gameArea.addEventListener('drop', e => {
 // CLICK ANIMAL ON CANVAS
 // ════════════════════════════════════════
 canvas.addEventListener('click', e => {
-  const rect   = canvas.getBoundingClientRect();
-  const scaleX = canvas.width  / rect.width;
-  const scaleY = canvas.height / rect.height;
-  const mx = (e.clientX - rect.left) * scaleX;
-  const my = (e.clientY - rect.top)  * scaleY;
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (canvas.width  / rect.width);
+  const my = (e.clientY - rect.top)  * (canvas.height / rect.height);
+  const ch = canvas.height;
+  const tabY = ch - TAB_H - TAB_MARGIN;
 
-  for (const a of canvasAnimals) {
-    if (mx >= a.x - CARD_W/2 && mx <= a.x + CARD_W/2 &&
-        my >= a.y - CARD_H/2 && my <= a.y + CARD_H/2) {
-      openChat(a);
-      return;
+  // Tab bar region
+  if (my >= tabY) {
+    // World tabs
+    for (let i = 0; i < worlds.length; i++) {
+      const tx = TAB_MARGIN + i * (TAB_W + TAB_GAP);
+      if (mx >= tx && mx <= tx + TAB_W) {
+        if (activeChatAnimal) { activeChatAnimal.chatting = false; activeChatAnimal = null; }
+        activeWorldId = worlds[i].id;
+        currentSpeech = ''; userSpeech = '';
+        speechBar.classList.add('hidden');
+        return;
+      }
     }
+    // New Group button
+    const bx = TAB_MARGIN + worlds.length * (TAB_W + TAB_GAP);
+    if (mx >= bx && mx <= bx + NEW_BTN_W) {
+      if (!pendingNewWorld) {
+        pendingNewWorld = { id: worldIdCounter++, envId: null, envLabel: 'New Group', animals: [] };
+        worlds.push(pendingNewWorld);
+      }
+      if (activeChatAnimal) { activeChatAnimal.chatting = false; activeChatAnimal = null; }
+      activeWorldId = pendingNewWorld.id;
+      currentSpeech = ''; userSpeech = '';
+      speechBar.classList.add('hidden');
+    }
+    return;
+  }
+
+  // Animal clicks
+  const world = getActiveWorld();
+  if (!world) return;
+  for (const a of world.animals) {
+    const dx = mx - a.x, dy = my - a.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 38) { openChat(a); return; }
+  }
+
+  // Background click — close chat
+  if (activeChatAnimal) {
+    activeChatAnimal.chatting = false;
+    activeChatAnimal = null;
+    currentSpeech = ''; userSpeech = '';
+    speechBar.classList.add('hidden');
   }
 });
 
@@ -659,6 +774,7 @@ RULES — follow these every single response, no exceptions:
 
 async function openChat(animal) {
   activeChatAnimal = animal;
+  animal.chatting = true;
   loadingEmoji.textContent = animal.emoji;
   loadingText.textContent  = `Waking up ${animal.name}...`;
   loadingOverlay.classList.remove('hidden');
@@ -685,6 +801,7 @@ async function openChat(animal) {
   } catch(err) {
     loadingOverlay.classList.add('hidden');
     alert('Could not connect. Please try again.');
+    animal.chatting = false;
     activeChatAnimal = null;
   }
 }
@@ -741,7 +858,7 @@ chatSend.addEventListener('click', sendMessage);
 chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
 
 closeChatBtn.addEventListener('click', () => {
-  activeChatAnimal = null;
+  if (activeChatAnimal) { activeChatAnimal.chatting = false; activeChatAnimal = null; }
   currentSpeech = '';
   userSpeech = '';
   speechBar.classList.add('hidden');
