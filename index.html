@@ -326,7 +326,7 @@ function drawQuadruped(a,d){
     const ew=d.ears==='huge'?9:5,eh=d.ears==='huge'?17:12;
     ctx.fillStyle=d.body;
     ctx.beginPath();ctx.ellipse(hx-5,hy-hr-eh*.5,ew,eh,-.3,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(hx+3,hy-hr-eh*.4,ew-1,eh,. 3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(hx+3,hy-hr-eh*.4,ew-1,eh,.3,0,Math.PI*2);ctx.fill();
   } else {
     ctx.fillStyle=d.body;ctx.beginPath();ctx.arc(hx-5,hy-hr+3,5*sc,0,Math.PI*2);ctx.fill();
     if(d.ears==='pointed'){ctx.fillStyle=d.body;ctx.beginPath();ctx.moveTo(hx-6,hy-hr+2);ctx.lineTo(hx-10,hy-hr-9);ctx.lineTo(hx-2,hy-hr+2);ctx.fill();}
