@@ -1185,7 +1185,7 @@ function initJungleTrees(w,h,gy){
 }
 
 function drawJungleBackground(w,h,gy){
-  // sky gradient
+  // sky
   const sg=ctx.createLinearGradient(0,0,0,gy);
   sg.addColorStop(0,'#9fdc72');sg.addColorStop(1,'#5aaa28');
   ctx.fillStyle=sg;ctx.fillRect(0,0,w,gy);
@@ -1194,78 +1194,62 @@ function drawJungleBackground(w,h,gy){
   gg.addColorStop(0,'#3a7520');gg.addColorStop(1,'#1e4510');
   ctx.fillStyle=gg;ctx.fillRect(0,gy,w,h-gy);
 
-  // trees first pass (behind vines)
+  // ── BACKGROUND HANGING VINES (from top, gentle sway) ──
+  const vineFracs=[.05,.13,.24,.36,.50,.64,.76,.87,.95];
+  ctx.lineCap='round';
+  vineFracs.forEach((frac,i)=>{
+    const vx=w*frac;
+    const vlen=gy*(0.45+((i*41+7)%13)*0.04); // varied lengths, stays above ground
+    const sway=Math.sin(_t*0.35+i*1.2)*7;
+    ctx.strokeStyle='rgba(38,85,14,0.35)';
+    ctx.lineWidth=3;
+    ctx.beginPath();
+    ctx.moveTo(vx,0);
+    ctx.quadraticCurveTo(vx+sway*0.5,vlen*0.5,vx+sway,vlen);
+    ctx.stroke();
+    // two leaves near midpoint
+    ctx.fillStyle='rgba(50,110,18,0.38)';
+    const lx=vx+sway*0.6,ly=vlen*0.6;
+    ctx.beginPath();ctx.ellipse(lx-7,ly,9,4,-.5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(lx+7,ly,9,4,.5,0,Math.PI*2);ctx.fill();
+  });
+
+  // ── TREES ──
   initJungleTrees(w,h,gy);
-  const t2=_t;
   jungleTrees.forEach(t=>{
     // trunk
     ctx.fillStyle='#4e342e';
     ctx.fillRect(t.x-8,gy-t.trunkH,16,t.trunkH);
-    // wide branch stubs
+    // branches
     ctx.strokeStyle='#3e2723';ctx.lineWidth=10;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(t.x,t.branchY);ctx.lineTo(t.x-t.leafR*.95,t.branchY+14);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(t.x,t.branchY);ctx.lineTo(t.x+t.leafR*.95,t.branchY+14);ctx.stroke();
-    ctx.lineWidth=7;
-    ctx.beginPath();ctx.moveTo(t.x-t.leafR*.5,t.branchY+8);ctx.lineTo(t.x-t.leafR*1.1,t.branchY+26);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(t.x+t.leafR*.5,t.branchY+8);ctx.lineTo(t.x+t.leafR*1.1,t.branchY+26);ctx.stroke();
-    ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(t.x,t.branchY);ctx.lineTo(t.x,t.branchY-18);ctx.stroke();
-    // leaf canopy (layered)
-    ctx.fillStyle='#2e7d32';ctx.beginPath();ctx.arc(t.x,t.branchY-t.leafR*.48,t.leafR,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.moveTo(t.x,t.branchY);ctx.lineTo(t.x-t.leafR*.9,t.branchY+12);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(t.x,t.branchY);ctx.lineTo(t.x+t.leafR*.9,t.branchY+12);ctx.stroke();
+    ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(t.x,t.branchY);ctx.lineTo(t.x,t.branchY-14);ctx.stroke();
+    // leaf canopy
+    ctx.fillStyle='#2e7d32';ctx.beginPath();ctx.arc(t.x,t.branchY-t.leafR*.45,t.leafR,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#388e3c';
-    ctx.beginPath();ctx.ellipse(t.x-t.leafR*.8,t.branchY+10,t.leafR*.68,t.leafR*.42,-.28,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(t.x+t.leafR*.8,t.branchY+10,t.leafR*.68,t.leafR*.42,.28,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(t.x-t.leafR*1.05,t.branchY+22,t.leafR*.5,t.leafR*.32,-.18,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(t.x+t.leafR*1.05,t.branchY+22,t.leafR*.5,t.leafR*.32,.18,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#1b5e20';ctx.beginPath();ctx.arc(t.x,t.branchY-t.leafR*.72,t.leafR*.55,0,Math.PI*2);ctx.fill();
-    // bright highlight tuft
-    ctx.fillStyle='rgba(100,200,60,0.22)';ctx.beginPath();ctx.arc(t.x-t.leafR*.15,t.branchY-t.leafR*.6,t.leafR*.35,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(t.x-t.leafR*.8,t.branchY+10,t.leafR*.65,t.leafR*.4,-.28,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(t.x+t.leafR*.8,t.branchY+10,t.leafR*.65,t.leafR*.4,.28,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1b5e20';ctx.beginPath();ctx.arc(t.x,t.branchY-t.leafR*.7,t.leafR*.52,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(100,200,60,0.2)';ctx.beginPath();ctx.arc(t.x-t.leafR*.15,t.branchY-t.leafR*.55,t.leafR*.3,0,Math.PI*2);ctx.fill();
   });
 
-  // ── HANGING VINES from branch tips ──
+  // ── HANGING VINES FROM TREE BRANCHES ──
   jungleTrees.forEach(t=>{
     t.vines.forEach((v,vi)=>{
-      const swing=Math.sin(t2+vi*1.3+t.x*.01)*8;
-      const startX=t.x+v.ox;
-      const startY=t.branchY+6;
-      const endY=v.drop;
-      const tipX=startX+swing;
-      // thick vine rope
-      ctx.strokeStyle='#33691e';ctx.lineWidth=4;ctx.lineCap='round';
-      ctx.beginPath();
-      ctx.moveTo(startX,startY);
-      ctx.quadraticCurveTo(startX+swing*.4,(startY+endY)/2,tipX,endY);
-      ctx.stroke();
-      // small leaves along vine
+      const sway=Math.sin(_t*0.45+vi*1.4+t.x*.004)*6;
+      const sx=t.x+v.ox, sy=t.branchY+8;
+      const ex=sx+sway, ey=v.drop;
+      ctx.strokeStyle='#33691e';ctx.lineWidth=3;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(sx,sy);ctx.quadraticCurveTo(sx+sway*.5,(sy+ey)/2,ex,ey);ctx.stroke();
+      // leaf pair at middle
       ctx.fillStyle='#558b2f';
-      for(let lp=0.25;lp<=0.85;lp+=0.3){
-        const lx=startX+(tipX-startX)*lp;
-        const ly=startY+(endY-startY)*lp;
-        const lsw=Math.sin(lp*Math.PI)*6;
-        ctx.beginPath();ctx.ellipse(lx+lsw,ly,7,4,lp*1.5,0,Math.PI*2);ctx.fill();
-        ctx.beginPath();ctx.ellipse(lx-lsw,ly+3,6,3,-lp*1.5,0,Math.PI*2);ctx.fill();
-      }
-      // vine tip curl
-      ctx.strokeStyle='#33691e';ctx.lineWidth=2;
-      ctx.beginPath();ctx.arc(tipX,endY+4,4,-.8,Math.PI*.6);ctx.stroke();
+      const mx=sx+(ex-sx)*0.5,my=sy+(ey-sy)*0.5;
+      ctx.beginPath();ctx.ellipse(mx-5,my,6,3,-.4,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(mx+5,my,6,3,.4,0,Math.PI*2);ctx.fill();
+      // tip dot
+      ctx.fillStyle='#2d5a1b';ctx.beginPath();ctx.arc(ex,ey,3,0,Math.PI*2);ctx.fill();
     });
-  });
-
-  // background atmospheric vines (thick, visible)
-  ctx.lineCap='round';
-  const vineSeed=[.06,.18,.31,.47,.58,.71,.84,.93];
-  vineSeed.forEach((frac,i)=>{
-    const vx=w*frac;
-    const swing2=Math.sin(t2*.7+i*0.9)*14;
-    ctx.strokeStyle=`rgba(45,100,18,${0.45+i%3*0.12})`;ctx.lineWidth=5+i%2*2;
-    ctx.beginPath();ctx.moveTo(vx,0);
-    ctx.bezierCurveTo(vx+swing2,h*.18,vx-swing2*.8,h*.38,vx+swing2*.5,h*.62);
-    ctx.stroke();
-    // leaves on background vines
-    ctx.fillStyle=`rgba(60,130,30,0.4)`;
-    for(let lf=0.15;lf<=0.55;lf+=0.2){
-      const lx=vx+swing2*(lf*2-0.5);const ly=h*lf;
-      ctx.beginPath();ctx.ellipse(lx+8,ly,10,5,lf*2,0,Math.PI*2);ctx.fill();
-    }
   });
 }
 
