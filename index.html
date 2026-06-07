@@ -2275,34 +2275,6 @@ function setAudioVolume(vol){
   if(audioCtx&&!audioMuted)masterGain.gain.setTargetAtTime(vol,audioCtx.currentTime,.1);
 }
 
-// ── Low-level sound helpers ──
-function _n(ot,f0,f1,dur,v,d){  // oscillator note
-  if(!audioCtx||!masterGain)return;
-  const T=audioCtx.currentTime+(d||0);
-  const osc=audioCtx.createOscillator(),g=audioCtx.createGain();
-  osc.type=ot;osc.frequency.setValueAtTime(f0,T);
-  if(f1!==f0)osc.frequency.exponentialRampToValueAtTime(Math.max(f1,1),T+dur*.88);
-  g.gain.setValueAtTime(.0001,T);g.gain.linearRampToValueAtTime(v,T+Math.min(.02,dur*.15));
-  g.gain.exponentialRampToValueAtTime(.0001,T+dur);
-  osc.connect(g);g.connect(masterGain);osc.start(T);osc.stop(T+dur+.05);
-}
-function _nb(f0,f1,dur,v,d){_n('sine',f0,f1,dur,v,d);}
-function _ns(f0,f1,dur,v,d){_n('sawtooth',f0,f1,dur,v,d);}
-function _sq(f0,f1,dur,v,d){_n('square',f0,f1,dur,v,d);}
-function _noise(freq,q,dur,v,d){  // filtered noise burst
-  if(!audioCtx||!masterGain)return;
-  const T=audioCtx.currentTime+(d||0),sr=audioCtx.sampleRate;
-  const len=Math.ceil(sr*(dur+.12));
-  const buf=audioCtx.createBuffer(1,len,sr);
-  const data=buf.getChannelData(0);for(let i=0;i<len;i++)data[i]=Math.random()*2-1;
-  const src=audioCtx.createBufferSource();src.buffer=buf;
-  const flt=audioCtx.createBiquadFilter();flt.type='bandpass';flt.frequency.value=freq;flt.Q.value=q;
-  const g=audioCtx.createGain();
-  g.gain.setValueAtTime(.0001,T);g.gain.linearRampToValueAtTime(v,T+.015);
-  g.gain.exponentialRampToValueAtTime(.0001,T+dur);
-  src.connect(flt);flt.connect(g);g.connect(masterGain);src.start(T);src.stop(T+dur+.05);
-}
-
 // ── Sound type per animal ──
 const SOUND_TYPE={
   'Macaw':'squawk','Peacock':'squawk','Penguin':'squawk','Flamingo':'squawk',
@@ -2338,105 +2310,177 @@ const SOUND_TYPE={
 
 function playAnimalSound(name){
   if(!audioCtx||audioMuted||audioCtx.state==='suspended')return;
-  const type=SOUND_TYPE[name];
-  if(!type)return;
-  const V=0.45;
+  const type=SOUND_TYPE[name];if(!type)return;
+  const V=0.5,now=audioCtx.currentTime;
+
+  // Pure sine sweep — whale, dolphin, owl, wolf, frog pulses
+  function S(f0,f1,dur,v,d=0){
+    const T=now+d,osc=audioCtx.createOscillator(),g=audioCtx.createGain();
+    osc.type='sine';osc.frequency.setValueAtTime(f0,T);
+    if(f1!==f0)osc.frequency.exponentialRampToValueAtTime(Math.max(f1,20),T+dur*.88);
+    g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+Math.min(.025,dur*.12));
+    g.gain.exponentialRampToValueAtTime(.0001,T+dur);
+    osc.connect(g);g.connect(masterGain);osc.start(T);osc.stop(T+dur+.06);
+  }
+
+  // Bandpass-filtered white noise — roars, barks, grunts, bee, hiss
+  // Sounds organic & natural, no buzzy sawtooth artifacts
+  function N(fc,q,dur,v,d=0){
+    const T=now+d,sr=audioCtx.sampleRate,len=Math.ceil(sr*(dur+.12));
+    const buf=audioCtx.createBuffer(1,len,sr),data=buf.getChannelData(0);
+    for(let i=0;i<len;i++)data[i]=Math.random()*2-1;
+    const src=audioCtx.createBufferSource();src.buffer=buf;
+    const flt=audioCtx.createBiquadFilter();flt.type='bandpass';flt.frequency.value=fc;flt.Q.value=q;
+    const g=audioCtx.createGain();
+    g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,T+dur);
+    src.connect(flt);flt.connect(g);g.connect(masterGain);src.start(T);src.stop(T+dur+.12);
+  }
+
+  // FM synthesis — birds, crows, monkeys, yips (bright complex organic tones)
+  function FM(fc,ratio,depth,dur,v,sweep=1,d=0){
+    const T=now+d,car=audioCtx.createOscillator(),mod=audioCtx.createOscillator();
+    const mG=audioCtx.createGain(),env=audioCtx.createGain();
+    car.type='sine';mod.type='sine';
+    car.frequency.setValueAtTime(fc,T);
+    if(sweep!==1)car.frequency.exponentialRampToValueAtTime(Math.max(fc*sweep,20),T+dur*.85);
+    mod.frequency.value=fc*ratio;mG.gain.value=fc*depth;
+    mod.connect(mG);mG.connect(car.frequency);
+    env.gain.setValueAtTime(0,T);env.gain.linearRampToValueAtTime(v,T+Math.min(.02,dur*.12));
+    env.gain.exponentialRampToValueAtTime(.0001,T+dur);
+    car.connect(env);env.connect(masterGain);
+    car.start(T);car.stop(T+dur+.06);mod.start(T);mod.stop(T+dur+.06);
+  }
+
+  // Formant / voiced synthesis — moo, oink, neigh, baa, cluck, honk
+  // Glottal pulse train → two resonant formant filters = actual vocal tract physics
+  function Voice(fund,f1,f2,dur,v,fund_end,d=0){
+    const T=now+d,sr=audioCtx.sampleRate,len=Math.ceil(sr*(dur+.14));
+    const buf=audioCtx.createBuffer(1,len,sr),data=buf.getChannelData(0);
+    const fEnd=fund_end||fund;
+    for(let i=0;i<len;i++){
+      const f=fund+(fEnd-fund)*(i/len),period=sr/f,ph=(i%period)/period;
+      data[i]=ph<.45?Math.sin(Math.PI*ph/.45)*.85+(Math.random()-.5)*.08:(Math.random()-.5)*.04;
+    }
+    const src=audioCtx.createBufferSource();src.buffer=buf;
+    const r1=audioCtx.createBiquadFilter();r1.type='bandpass';r1.frequency.value=f1;r1.Q.value=6;
+    const r2=audioCtx.createBiquadFilter();r2.type='bandpass';r2.frequency.value=f2;r2.Q.value=8;
+    const mix=audioCtx.createGain();mix.gain.value=.5;
+    const env=audioCtx.createGain();
+    env.gain.setValueAtTime(0,T);env.gain.linearRampToValueAtTime(v,T+dur*.1);
+    env.gain.setValueAtTime(v,T+dur*.78);env.gain.exponentialRampToValueAtTime(.0001,T+dur);
+    src.connect(r1);src.connect(r2);r1.connect(mix);r2.connect(mix);mix.connect(env);env.connect(masterGain);
+    src.start(T);src.stop(T+dur+.14);
+  }
+
   switch(type){
-    case'chirp':  // small birds — 2-3 quick chirps
-      [0,.13,.26].slice(0,2+Math.round(Math.random())).forEach(d=>
-        _nb(2100+Math.random()*400,3500+Math.random()*500,.09,V*.5,d));
+    // ── BIRDS ────────────────────────────────────────────────────────
+    case'chirp':  // small birds: FM chirps — sounds like real tweeting
+      for(let i=0;i<2+Math.round(Math.random());i++){
+        const fc=2300+Math.random()*900;
+        FM(fc,2.08+Math.random()*.5,2.4,.1,V*.38,1.55+Math.random()*.6,i*.13);
+      }
       break;
-    case'squawk': // macaw/parrot/peacock — harsh double squawk
-      _ns(680,360,.13,V*.62);_ns(880,480,.11,V*.52,.2);
+    case'squawk': // macaw/parrot: descending FM squawk
+      FM(620,1.45,3.8,.17,V*.5,.45);FM(720,1.6,3.2,.14,V*.44,.52,.22);
       break;
-    case'hoot':   // owl — two mellow hoots
-      _nb(365,342,.42,V*.56);_nb(325,304,.4,V*.5,.58);
+    case'hoot':   // owl: two pure sine hoots (very recognizable)
+      S(375,356,.48,V*.5);S(334,316,.46,V*.45,.65);
       break;
-    case'caw':    // crow/vulture — 2-3 caws
-      [0,.22,.44].slice(0,2+Math.round(Math.random())).forEach(d=>
-        _ns(440,700,.16,V*.56,d));
+    case'caw':    // crow: FM caw
+      [0,.26,.52].slice(0,2+Math.round(Math.random())).forEach(d=>FM(370,3.1,2.4,.18,V*.5,1.9,d));
       break;
-    case'honk':   // swan/goose
-      _ns(310,470,.4,V*.62);_ns(275,410,.34,V*.52,.5);
+    case'honk':   // swan/goose: voiced nasal honk
+      Voice(265,950,2300,.44,V*.48,315);Voice(242,850,2100,.38,V*.44,288,.54);
       break;
-    case'buzz':   // bee — short flat buzz
-      _sq(195,180,.34,V*.3);
+    // ── INSECTS ──────────────────────────────────────────────────────
+    case'buzz':   // bee: wing noise (filtered noise = much more realistic than square)
+      N(240,12,.36,V*.28);S(238,238,.36,V*.14);
       break;
-    case'cricket':// cricket — rhythmic pulses
-      for(let i=0;i<6;i++)_sq(4900,4900,.025,V*.36,i*.052);
+    case'cricket':// cricket: pure sine pulses at 4.5kHz = stridulation
+      for(let i=0;i<8;i++)S(4500+Math.random()*200,4500,.025,V*.3,i*.053);
       break;
-    case'dolphin':// high whistle glide + echolocation clicks
-      _nb(7200,14500,.22,V*.44);_nb(14000,5000,.28,V*.38,.25);
-      [.56,.585,.61].forEach(d=>_nb(1500,900,.022,V*.36,d));
+    // ── OCEAN ────────────────────────────────────────────────────────
+    case'dolphin':// very high-freq whistle sweep + echolocation clicks
+      S(7200,16500,.2,V*.42);S(16500,5800,.24,V*.37,.22);
+      [.52,.545,.57,.595].forEach(d=>S(2400,1000,.016,V*.3,d));
       break;
-    case'whale':  // long low moan
-      {const osc=audioCtx.createOscillator(),g=audioCtx.createGain(),now=audioCtx.currentTime;
-      osc.type='sine';osc.frequency.setValueAtTime(68,now);
-      osc.frequency.exponentialRampToValueAtTime(185,now+.85);
-      osc.frequency.exponentialRampToValueAtTime(52,now+2.2);
-      g.gain.setValueAtTime(.0001,now);g.gain.linearRampToValueAtTime(V*.52,now+.35);
-      g.gain.exponentialRampToValueAtTime(.0001,now+2.2);
-      osc.connect(g);g.connect(masterGain);osc.start(now);osc.stop(now+2.3);}
+    case'whale':  // long sub-bass moan — actually sounds like a whale!
+      {const osc=audioCtx.createOscillator(),g=audioCtx.createGain();
+      osc.type='sine';osc.frequency.setValueAtTime(62,now);
+      osc.frequency.exponentialRampToValueAtTime(190,now+.9);
+      osc.frequency.exponentialRampToValueAtTime(46,now+2.3);
+      g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(V*.52,now+.42);
+      g.gain.exponentialRampToValueAtTime(.0001,now+2.3);
+      osc.connect(g);g.connect(masterGain);osc.start(now);osc.stop(now+2.4);}
       break;
-    case'seal':   // 2-3 barky woofs
-      [0,.26,.5].slice(0,2+Math.round(Math.random())).forEach(d=>{
-        _ns(470,200,.13,V*.58,d);_ns(330,180,.09,V*.44,d+.07);});
+    case'seal':   // barky woofs: layered noise (no sawtooth)
+      [0,.32,.62].slice(0,2+Math.round(Math.random())).forEach(d=>{
+        N(560,4,.14,V*.52,d);N(310,7,.1,V*.4,d+.06);S(290,170,.1,V*.28,d);});
       break;
-    case'roar':   // big cat / bear — rumbling roar
-      _ns(78,145,.9,V*.54);_noise(210,1.8,.95,V*.44,.07);
+    // ── LARGE MAMMALS ────────────────────────────────────────────────
+    case'roar':   // lion/bear: layered noise bands — no sawtooth = no fart!
+      N(140,1.8,1.1,V*.56);N(420,2.5,.8,V*.38,.1);S(88,130,.65,V*.26,.04);
       break;
-    case'elephant':// trumpet — ascending screech
-      _ns(195,700,.75,V*.64);_ns(370,230,.36,V*.5,.8);
+    case'elephant':// trumpet: square through resonant bandpass (bright & brassy)
+      {const osc=audioCtx.createOscillator(),flt=audioCtx.createBiquadFilter(),g=audioCtx.createGain();
+      osc.type='square';osc.frequency.setValueAtTime(198,now);osc.frequency.exponentialRampToValueAtTime(660,now+.74);
+      flt.type='bandpass';flt.frequency.value=1400;flt.Q.value=1.4;
+      g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(V*.46,now+.08);
+      g.gain.exponentialRampToValueAtTime(.0001,now+.84);
+      osc.connect(flt);flt.connect(g);g.connect(masterGain);osc.start(now);osc.stop(now+.9);}
       break;
-    case'howl':   // wolf — long ascending howl
-      {const osc=audioCtx.createOscillator(),g=audioCtx.createGain(),now=audioCtx.currentTime;
-      osc.type='sine';osc.frequency.setValueAtTime(162,now);
-      osc.frequency.exponentialRampToValueAtTime(730,now+.62);
-      osc.frequency.exponentialRampToValueAtTime(550,now+1.55);
-      g.gain.setValueAtTime(.0001,now);g.gain.linearRampToValueAtTime(V*.56,now+.18);
-      g.gain.exponentialRampToValueAtTime(.0001,now+1.58);
-      osc.connect(g);g.connect(masterGain);osc.start(now);osc.stop(now+1.65);}
+    case'howl':   // wolf: long pure sine sweep — actually sounds like a howl!
+      {const osc=audioCtx.createOscillator(),g=audioCtx.createGain();
+      osc.type='sine';osc.frequency.setValueAtTime(155,now);
+      osc.frequency.exponentialRampToValueAtTime(750,now+.68);
+      osc.frequency.exponentialRampToValueAtTime(572,now+1.65);
+      g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(V*.56,now+.22);
+      g.gain.exponentialRampToValueAtTime(.0001,now+1.68);
+      osc.connect(g);g.connect(masterGain);osc.start(now);osc.stop(now+1.74);}
       break;
-    case'moo':    // cow
-      _ns(118,195,.4,V*.56);_ns(195,98,.6,V*.52,.42);
+    // ── FARM ANIMALS — formant synthesis (glottal source + vocal tract) ──
+    case'moo':    // cow: F1=320 F2=800 = "oo" vowel shape
+      Voice(128,320,800,.92,V*.52,100);
       break;
-    case'oink':   // pig
-      _ns(490,270,.13,V*.54);_ns(440,245,.12,V*.48,.23);
+    case'oink':   // pig: higher nasal formants, short
+      Voice(198,580,1380,.22,V*.5,160);Voice(178,540,1280,.2,V*.46,142,.3);
       break;
-    case'neigh':  // horse
-      _ns(275,660,.38,V*.56);_ns(660,200,.33,V*.48,.4);
+    case'neigh':  // horse: rising voiced whinny + falling squeal
+      Voice(298,700,1850,.44,V*.5,660);S(640,195,.28,V*.3,.46);
       break;
-    case'baa':    // sheep — vibrato bleat
-      {const osc=audioCtx.createOscillator(),g=audioCtx.createGain(),
-       vib=audioCtx.createOscillator(),vibG=audioCtx.createGain(),now=audioCtx.currentTime;
-      osc.type='sine';osc.frequency.setValueAtTime(420,now);
-      osc.frequency.exponentialRampToValueAtTime(352,now+.46);
-      vib.frequency.value=6;vibG.gain.value=14;vib.connect(vibG);vibG.connect(osc.frequency);
-      g.gain.setValueAtTime(.0001,now);g.gain.linearRampToValueAtTime(V*.46,now+.06);
-      g.gain.exponentialRampToValueAtTime(.0001,now+.48);
-      osc.connect(g);g.connect(masterGain);osc.start(now);osc.stop(now+.52);
-      vib.start(now);vib.stop(now+.52);}
+    case'baa':    // sheep: vibrato bleat through bandpass
+      {const osc=audioCtx.createOscillator(),vib=audioCtx.createOscillator();
+      const vG=audioCtx.createGain(),flt=audioCtx.createBiquadFilter(),g=audioCtx.createGain();
+      osc.type='sine';osc.frequency.setValueAtTime(418,now);osc.frequency.exponentialRampToValueAtTime(346,now+.54);
+      vib.frequency.value=7;vG.gain.value=18;
+      flt.type='bandpass';flt.frequency.value=1100;flt.Q.value=2.5;
+      g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(V*.46,now+.06);
+      g.gain.exponentialRampToValueAtTime(.0001,now+.58);
+      vib.connect(vG);vG.connect(osc.frequency);osc.connect(flt);flt.connect(g);g.connect(masterGain);
+      osc.start(now);osc.stop(now+.62);vib.start(now);vib.stop(now+.62);}
       break;
-    case'ribbit': // frog — two-tone ribbit
-      _sq(1200,820,.09,V*.5);_sq(1000,720,.08,V*.46,.14);
+    case'cluck':  // chicken: voiced cluck
+      Voice(282,700,1550,.12,V*.46,245);Voice(256,640,1400,.1,V*.4,220,.18);S(385,342,.15,V*.22,.32);
       break;
-    case'hiss':   // snake — noise burst
-      _noise(5800,1.4,.46,V*.4);
+    // ── OTHER ────────────────────────────────────────────────────────
+    case'ribbit': // frog: rapid sine pulses (~25Hz cadence = actual ribbit texture)
+      for(let p=0;p<2;p++)for(let i=0;i<7;i++)S(1850,1700,.028,V*.44,p*.24+i*.038);
       break;
-    case'monkey': // monkey — descending chatter
-      [0,.13,.26,.39].forEach((d,i)=>_ns(575-i*65,275-i*30,.09,V*.44,d));
+    case'hiss':   // snake: high-frequency filtered noise
+      N(5400,1.2,.5,V*.4);
       break;
-    case'grunt':  // generic mammal grunt
-      _ns(105,155,.2,V*.5);
+    case'monkey': // monkey: FM descending chatter
+      for(let i=0;i<4;i++)FM(488-i*52,2.25,1.7,.11,V*.42,.7,i*.14);
       break;
-    case'yip':    // fox/raccoon — double yip
-      _ns(880,480,.09,V*.46);_ns(800,420,.08,V*.4,.17);
+    case'grunt':  // generic mammal: noise burst + low sine (no sawtooth)
+      N(165,3,.24,V*.46);S(112,152,.18,V*.22,.02);
       break;
-    case'chitter':// small mammals — rapid chattering
-      [0,.07,.14,.21].forEach(d=>_sq(2100+Math.random()*400,2900,.046,V*.34,d));
+    case'yip':    // fox/raccoon: FM yip
+      FM(1150,.52,2.8,.11,V*.44,.46);FM(980,.54,2.5,.1,V*.38,.44,.18);
       break;
-    case'cluck':  // chicken/turkey
-      _ns(640,295,.09,V*.5);_ns(475,240,.07,V*.4,.14);_nb(375,340,.14,V*.3,.26);
+    case'chitter':// small animals: rapid FM chitter
+      for(let i=0;i<4;i++)FM(1850+Math.random()*600,2.3,2.1,.05,V*.3,1.22+Math.random()*.42,i*.07);
       break;
   }
 }
