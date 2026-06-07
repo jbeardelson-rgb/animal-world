@@ -120,7 +120,7 @@ function hasBadWord(t){const l=t.toLowerCase();return BAD_WORDS.some(w=>new RegE
 
 // ── Move types — Flamingo/Chicken/Turkey/Rooster/Duck are WALKERS ──
 const FLY_NAMES   = new Set(['Macaw','Butterfly','Snowy Owl','Snow Bunting','Dove','Crow','Bee','Vulture','Peacock','Swan']);
-const SWIM_NAMES  = new Set(['Shark','Dolphin','Octopus','Whale','Clownfish','Squid','Blowfish','Tuna','Narwhal','Seal','Otter']);
+const SWIM_NAMES  = new Set(['Shark','Dolphin','Octopus','Whale','Clownfish','Squid','Blowfish','Tuna','Narwhal','Seal']);
 const FLOOR_NAMES = new Set(['Crab','Lobster','Shrimp']);
 const DRIFT_NAMES = new Set(['Jellyfish']);
 const SWING_NAMES = new Set(['Monkey']);
@@ -243,7 +243,10 @@ const AD = {
 };
 
 function dk(hex,amt){
+  if(!hex||hex[0]!=='#')return hex||'#888';
+  if(hex.length===4)hex='#'+hex[1]+hex[1]+hex[2]+hex[2]+hex[3]+hex[3];
   let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  if(isNaN(r)||isNaN(g)||isNaN(b))return hex;
   r=Math.max(0,r-amt);g=Math.max(0,g-amt);b=Math.max(0,b-amt);
   return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
@@ -289,11 +292,6 @@ function drawBubble(text,ax,ay,isUser){
 // ════════════════════════════════════════
 // ANIMAL SHAPE DRAWING
 // ════════════════════════════════════════
-function dk(hex,amt){
-  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  r=Math.max(0,r-amt);g=Math.max(0,g-amt);b=Math.max(0,b-amt);
-  return'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-}
 function legs(x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
 
 // ── CAT (tiger, lion, leopard, bobcat) ──
@@ -1376,76 +1374,79 @@ function drawSnail(a,d){
 // ── Main dispatch ──
 function drawAnimalShape(a,isActive){
   const d=AD[a.name]||{body:'#888',accent:'#666',shape:'bear'};
-  ctx.save();ctx.translate(a.x,a.y);
-  if(a.dir<0)ctx.scale(-1,1);
-  if(isActive){ctx.shadowColor='rgba(74,158,107,0.75)';ctx.shadowBlur=22;}
-  switch(d.shape){
-    case'cat':      drawCat(a,d);break;
-    case'horse':    drawHorse(a,d);break;
-    case'bear':     drawBear(a,d);break;
-    case'elephant': drawElephant(a,d);break;
-    case'giraffe':  drawGiraffe(a,d);break;
-    case'croc':     drawCroc(a,d);break;
-    case'rhino':    drawRhino(a,d);break;
-    case'hippo':    drawHippo(a,d);break;
-    case'camel':    drawCamel(a,d);break;
-    case'pig':      drawPig(a,d);break;
-    case'rabbit':   drawRabbit(a,d);break;
-    case'gorilla':  drawGorilla(a,d);break;
-    case'deer':     drawDeer(a,d);break;
-    case'wolf':     drawWolf(a,d);break;
-    case'fox':      drawFox(a,d);break;
-    case'frog':     drawFrog(a,d);break;
-    case'sloth':    drawSloth(a,d);break;
-    case'lizard':   drawLizard(a,d);break;
-    case'cow':      drawCow(a,d);break;
-    case'goat':     drawGoat(a,d);break;
-    case'sheep':    drawSheep(a,d);break;
-    case'llama':    drawLlama(a,d);break;
-    case'meerkat':  drawMeerkat(a,d);break;
-    case'bison':    drawBison(a,d);break;
-    case'warthog':  drawWarthog(a,d);break;
-    case'hedgehog': drawHedgehog(a,d);break;
-    case'badger':   drawBadger(a,d);break;
-    case'raccoon':  drawRaccoon(a,d);break;
-    case'beaver':   drawBeaver(a,d);break;
-    case'otter':    drawOtter(a,d);break;
-    case'squirrel': drawSquirrel(a,d);break;
-    case'fish':     drawFish(a,d);break;
-    case'bird':     drawBird(a,d);break;
-    case'bird_walk':drawBirdWalk(a,d);break;
-    case'flamingo': drawFlamingo(a,d);break;
-    case'penguin':  drawPenguin(a,d);break;
-    case'monkey':   drawMonkeyShape(a,d);break;
-    case'octopus':  drawOctopus(a,d);break;
-    case'jellyfish':drawJellyfish(a,d);break;
-    case'crab':     drawCrab(a,d);break;
-    case'seal':     drawSeal(a,d);break;
-    case'snake':    drawSnake(a,d);break;
-    case'butterfly':drawButterfly(a,d);break;
-    case'bee':      drawBee(a,d);break;
-    case'insect':   drawInsect(a,d);break;
-    case'spider':   drawSpider(a,d);break;
-    case'squid':    drawSquid(a,d);break;
-    case'shrimp':   drawShrimp(a,d);break;
-    case'snail':    drawSnail(a,d);break;
-    default:        drawBear(a,d);break;
-  }
-  ctx.restore();
-  // name tag
   ctx.save();
-  ctx.font='11px system-ui';ctx.textAlign='center';
-  const nw=ctx.measureText(a.name).width;
-  const tagY=a.y+50;
-  if(isActive){
-    drawRoundRect(ctx,a.x-nw/2-8,tagY,nw+16,17,8);
-    ctx.fillStyle='rgba(74,158,107,0.9)';ctx.fill();
-    ctx.fillStyle='#fff';ctx.textBaseline='middle';ctx.fillText(a.name,a.x,tagY+8);
-  } else {
-    ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.textBaseline='top';
-    ctx.strokeText(a.name,a.x,tagY);ctx.fillStyle='rgba(255,255,255,0.92)';ctx.fillText(a.name,a.x,tagY);
-  }
-  ctx.restore();
+  try{
+    ctx.translate(a.x,a.y);
+    if(a.dir<0)ctx.scale(-1,1);
+    if(isActive){ctx.shadowColor='rgba(74,158,107,0.75)';ctx.shadowBlur=22;}
+    switch(d.shape){
+      case'cat':      drawCat(a,d);break;
+      case'horse':    drawHorse(a,d);break;
+      case'bear':     drawBear(a,d);break;
+      case'elephant': drawElephant(a,d);break;
+      case'giraffe':  drawGiraffe(a,d);break;
+      case'croc':     drawCroc(a,d);break;
+      case'rhino':    drawRhino(a,d);break;
+      case'hippo':    drawHippo(a,d);break;
+      case'camel':    drawCamel(a,d);break;
+      case'pig':      drawPig(a,d);break;
+      case'rabbit':   drawRabbit(a,d);break;
+      case'gorilla':  drawGorilla(a,d);break;
+      case'deer':     drawDeer(a,d);break;
+      case'wolf':     drawWolf(a,d);break;
+      case'fox':      drawFox(a,d);break;
+      case'frog':     drawFrog(a,d);break;
+      case'sloth':    drawSloth(a,d);break;
+      case'lizard':   drawLizard(a,d);break;
+      case'cow':      drawCow(a,d);break;
+      case'goat':     drawGoat(a,d);break;
+      case'sheep':    drawSheep(a,d);break;
+      case'llama':    drawLlama(a,d);break;
+      case'meerkat':  drawMeerkat(a,d);break;
+      case'bison':    drawBison(a,d);break;
+      case'warthog':  drawWarthog(a,d);break;
+      case'hedgehog': drawHedgehog(a,d);break;
+      case'badger':   drawBadger(a,d);break;
+      case'raccoon':  drawRaccoon(a,d);break;
+      case'beaver':   drawBeaver(a,d);break;
+      case'otter':    drawOtter(a,d);break;
+      case'squirrel': drawSquirrel(a,d);break;
+      case'fish':     drawFish(a,d);break;
+      case'bird':     drawBird(a,d);break;
+      case'bird_walk':drawBirdWalk(a,d);break;
+      case'flamingo': drawFlamingo(a,d);break;
+      case'penguin':  drawPenguin(a,d);break;
+      case'monkey':   drawMonkeyShape(a,d);break;
+      case'octopus':  drawOctopus(a,d);break;
+      case'jellyfish':drawJellyfish(a,d);break;
+      case'crab':     drawCrab(a,d);break;
+      case'seal':     drawSeal(a,d);break;
+      case'snake':    drawSnake(a,d);break;
+      case'butterfly':drawButterfly(a,d);break;
+      case'bee':      drawBee(a,d);break;
+      case'insect':   drawInsect(a,d);break;
+      case'spider':   drawSpider(a,d);break;
+      case'squid':    drawSquid(a,d);break;
+      case'shrimp':   drawShrimp(a,d);break;
+      case'snail':    drawSnail(a,d);break;
+      default:        drawBear(a,d);break;
+    }
+  }finally{ctx.restore();}
+  // name tag — always drawn even if shape threw
+  ctx.save();
+  try{
+    ctx.font='11px system-ui';ctx.textAlign='center';
+    const nw=ctx.measureText(a.name).width;
+    const tagY=a.y+50;
+    if(isActive){
+      drawRoundRect(ctx,a.x-nw/2-8,tagY,nw+16,17,8);
+      ctx.fillStyle='rgba(74,158,107,0.9)';ctx.fill();
+      ctx.fillStyle='#fff';ctx.textBaseline='middle';ctx.fillText(a.name,a.x,tagY+8);
+    } else {
+      ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.textBaseline='top';
+      ctx.strokeText(a.name,a.x,tagY);ctx.fillStyle='rgba(255,255,255,0.92)';ctx.fillText(a.name,a.x,tagY);
+    }
+  }finally{ctx.restore();}
   if(isActive){
     if(userSpeech)drawBubble(userSpeech,a.x,a.y,true);
     if(currentSpeech)drawBubble(currentSpeech,a.x,a.y,false);
@@ -1656,7 +1657,7 @@ function drawArcticBackground(w,h,gy){
   iceGroups.forEach(({x,n,h:ih})=>{
     ctx.fillStyle='rgba(200,235,255,0.85)';
     ctx.beginPath();ctx.moveTo(x-n*8,gy);
-    for(let i=0;i<=n;i++){const px=x-n*8+i*(n*16/n);ctx.lineTo(px+(i%2===0?4:-4),gy-(i%2===0?ih:ih*.5+Math.random()*10));}
+    for(let i=0;i<=n;i++){const px=x-n*8+i*(n*16/n);ctx.lineTo(px+(i%2===0?4:-4),gy-(i%2===0?ih:ih*.5+(Math.sin(i*7.3+n)*5+5)));}
     ctx.lineTo(x+n*8,gy);ctx.closePath();ctx.fill();
     ctx.fillStyle='rgba(220,245,255,0.5)';
     ctx.beginPath();ctx.moveTo(x-n*6,gy);
