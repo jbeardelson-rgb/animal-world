@@ -1859,6 +1859,13 @@ function drawWorldTabs(){
     ctx.font='10px system-ui';ctx.fillStyle='#fff';ctx.textAlign='left';
     const label=world.envLabel||'New Group';
     ctx.fillText(label.length>9?label.slice(0,9):label,tx+32,ty+TAB_H/2);
+    // ── Trash delete button (top-right corner circle) ──
+    const trashX=tx+TAB_W,trashY=ty;
+    ctx.shadowColor='rgba(0,0,0,0.35)';ctx.shadowBlur=5;
+    ctx.fillStyle='#e53935';ctx.beginPath();ctx.arc(trashX,trashY,11,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.font='12px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('🗑',trashX,trashY+1);
     ctx.restore();
   });
   const bx=TAB_MARGIN+worlds.length*(TAB_W+TAB_GAP),by=canvas.height-TAB_H-TAB_MARGIN;
@@ -1972,6 +1979,28 @@ canvas.addEventListener('click',e=>{
   const mx=(e.clientX-rect.left)*(canvas.width/rect.width);
   const my=(e.clientY-rect.top)*(canvas.height/rect.height);
   const ch=canvas.height,tabY=ch-TAB_H-TAB_MARGIN;
+
+  // ── Trash button check (circle overlaps tab corner — checked before tabY gate) ──
+  for(let i=0;i<worlds.length;i++){
+    const tx=TAB_MARGIN+i*(TAB_W+TAB_GAP),ty=tabY;
+    const trashX=tx+TAB_W,trashY=ty;
+    if(Math.hypot(mx-trashX,my-trashY)<=13){
+      const wld=worlds[i];
+      // clean up chat if the deleted world's animal was chatting
+      if(activeChatAnimal&&wld.animals.some(a=>a.id===activeChatAnimal.id)){
+        activeChatAnimal.chatting=false;activeChatAnimal=null;
+        currentSpeech='';userSpeech='';speechBar.classList.add('hidden');
+      }
+      worlds.splice(i,1);
+      if(pendingNewWorld&&pendingNewWorld.id===wld.id)pendingNewWorld=null;
+      if(activeWorldId===wld.id){
+        activeWorldId=worlds.length?worlds[Math.max(0,i-1)].id:null;
+        currentSpeech='';userSpeech='';speechBar.classList.add('hidden');
+      }
+      return;
+    }
+  }
+
   if(my>=tabY){
     for(let i=0;i<worlds.length;i++){
       const tx=TAB_MARGIN+i*(TAB_W+TAB_GAP);
@@ -1999,14 +2028,21 @@ const closeChatBtn=document.getElementById('close-chat-btn');
 let conversations={},isSending=false;
 
 function buildSystemPrompt(animal){
-  return`You are ${animal.name}, a friendly and lovable ${animal.name} living in the ${animal.envLabel}. You love chatting with kids and families!
+  return`You are a ${animal.name} living in the ${animal.envLabel}. Speak in first person, in character, as this animal would — knowledgeable about your own species, habitat, and behaviors.
 
-RULES — follow EVERY response, no exceptions:
-- Stay fully in character as a real ${animal.name} — think, talk, and act like one
-- Family-friendly only, suitable for ages 4+, 2-3 sentences max
-- VERY IMPORTANT — REALISTIC ACTIONS: If the user asks you to do something a real ${animal.name} CANNOT do in real life, you MUST refuse in a playful way and suggest something you CAN do. Examples of impossible things by species: fish cannot climb trees or walk on land; chickens, turkeys, roosters, and flamingos cannot fly high (only hop or flutter); crabs cannot swim fast or climb; sharks cannot walk on land; penguins cannot fly. When refusing say something like "Ha! I'm a ${animal.name} — I can't do that! But I CAN [realistic thing a real ${animal.name} does]!"
-- If anyone uses bad language, reply: "Oops! Let's keep things nice and friendly! 🌟"
-- Be warm, playful, and encouraging at all times`;
+STRICT RULES — no exceptions, every response:
+
+1. NO ACTION/ROLEPLAY TEXT. Never write anything inside asterisks or brackets describing your physical actions — no *wags tail*, *roars*, *flaps wings*, *purrs*, *tilts head*, *nuzzles*, *sniffs*, [wagging tail], or anything like that. Speak only in words, like a real conversation.
+
+2. INFORMATIVE & DETAILED. Give 2–4 sentences per reply. Include at least one real, accurate fact about ${animal.name} — diet, habitat, behavior, adaptation, lifespan, speed, etc. Be genuinely interesting and educational, suitable for curious kids and teens up to age 14.
+
+3. IN CHARACTER. You ARE the animal. Refer to your own real-world instincts and abilities naturally. Don't say "as an animal" — just speak as yourself.
+
+4. PHYSICAL LIMITS. If asked to do something a real ${animal.name} physically cannot do, decline naturally and pivot to something you actually can do. Example: "I can't do that — but I can [real ability]."
+
+5. LANGUAGE. If anyone uses inappropriate language, respond only: "Let's keep this respectful."
+
+6. NEVER break character, never acknowledge being an AI or a game.`;
 }
 
 async function openChat(animal){
