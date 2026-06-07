@@ -74,6 +74,13 @@
     .animal-card.dragging { opacity: 0.4; transform: scale(0.95); }
     .animal-card .emoji { font-size: 26px; line-height: 1; pointer-events: none; }
     .animal-card .name  { font-size: 10px; color: #888; font-weight: 500; text-align: center; line-height: 1.2; pointer-events: none; }
+    #panel-footer{padding:10px 12px;border-top:1px solid #e0e0dc;flex-shrink:0;display:flex;flex-direction:column;gap:7px;}
+    .panel-action-btn{width:100%;padding:9px 0;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+    #clear-all-btn{background:#fee2e2;color:#b91c1c;}
+    #clear-all-btn:hover{background:#fca5a5;}
+    #delete-mode-btn{background:#f3e8ff;color:#7c3aed;}
+    #delete-mode-btn:hover{background:#e9d5ff;}
+    #delete-mode-btn.active{background:#7c3aed;color:#fff;}
     #drop-hint { position: absolute; inset: 0; pointer-events: none; z-index: 5; border: 3px dashed #4a9e6b; opacity: 0; transition: opacity 0.15s; background: rgba(74,158,107,0.04); display: flex; align-items: center; justify-content: center; }
     #drop-hint.active { opacity: 1; }
     #drop-hint span { font-size: 16px; color: #4a9e6b; font-weight: 600; background: rgba(255,255,255,0.9); padding: 8px 16px; border-radius: 20px; }
@@ -92,7 +99,7 @@
     </div>
     <div id="speech-bar" class="hidden">
       <button id="close-chat-btn" title="Stop chatting">✕</button>
-      <input id="chat-input" type="text" placeholder="Say something..." maxlength="200" />
+      <input id="chat-input" type="text" placeholder="Say something..." maxlength="45" />
       <button id="chat-send">&#x279C;</button>
     </div>
   </div>
@@ -103,6 +110,10 @@
       <div id="animals-area">
         <div id="env-label"></div>
         <div id="animals-grid"></div>
+      </div>
+      <div id="panel-footer">
+        <button class="panel-action-btn" id="clear-all-btn">🗑 Clear All Animals</button>
+        <button class="panel-action-btn" id="delete-mode-btn">✂ Delete an Animal</button>
       </div>
     </div>
   </div>
@@ -1906,6 +1917,13 @@ function drawAnimals(){
     ctx.globalAlpha=1;
     ctx.shadowColor='transparent';ctx.shadowBlur=0;
     ctx.globalCompositeOperation='source-over';
+    // Purple delete-mode highlight
+    if(deleteMode&&hoveredDeleteAnimal&&hoveredDeleteAnimal.id===a.id){
+      ctx.beginPath();ctx.arc(a.x,a.y,52,0,Math.PI*2);
+      ctx.fillStyle='rgba(139,0,255,0.15)';ctx.fill();
+      ctx.strokeStyle='rgba(139,0,255,0.7)';ctx.lineWidth=3;ctx.stroke();
+      ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.shadowColor='transparent';ctx.shadowBlur=0;
+    }
     try{drawAnimalShape(a,activeChatAnimal&&activeChatAnimal.id===a.id);}
     catch(ae){console.warn('Animal draw error:',a.name,ae);}
   });
@@ -1920,6 +1938,15 @@ loop();
 // DRAG & DROP
 // ════════════════════════════════════════
 let dragPayload=null;
+let deleteMode=false,hoveredDeleteAnimal=null;
+function setDeleteMode(on){
+  deleteMode=on;
+  if(!on){hoveredDeleteAnimal=null;canvas.style.cursor='';}
+  const btn=document.getElementById('delete-mode-btn');
+  btn.classList.toggle('active',on);
+  btn.textContent=on?'✓ Done Deleting':'✂ Delete an Animal';
+  canvas.style.cursor=on?'crosshair':'';
+}
 const dropHint=document.getElementById('drop-hint');
 const gameArea=document.getElementById('game-area');
 
@@ -1943,6 +1970,9 @@ gameArea.addEventListener('drop',e=>{
     // Reset jungle trees if switching away from/to jungle so scene re-initialises
     jungleTrees=[];
   }
+
+  // Max 12 animals per world
+  if(world.animals.length>=12){dragPayload=null;return;}
 
   let mt=getMoveType(dragPayload.name);
   if(world.envId==='farm')mt='walk';
@@ -2011,9 +2041,36 @@ canvas.addEventListener('click',e=>{
     return;
   }
   const world=getActiveWorld();if(!world)return;
+
+  // Delete mode: confirm + remove hovered animal
+  if(deleteMode){
+    if(hoveredDeleteAnimal&&world.animals.some(a=>a.id===hoveredDeleteAnimal.id)){
+      const name=hoveredDeleteAnimal.name,id=hoveredDeleteAnimal.id;
+      if(confirm(`Are you sure you want to delete ${name}?`)){
+        world.animals=world.animals.filter(a=>a.id!==id);
+        if(activeChatAnimal&&activeChatAnimal.id===id){activeChatAnimal.chatting=false;activeChatAnimal=null;currentSpeech='';userSpeech='';speechBar.classList.add('hidden');}
+        hoveredDeleteAnimal=null;
+      }
+    }
+    return; // Don't open chat while in delete mode
+  }
+
   for(const a of world.animals){const dx=mx-a.x,dy=my-a.y;if(Math.sqrt(dx*dx+dy*dy)<42){openChat(a);return;}}
   if(activeChatAnimal){activeChatAnimal.chatting=false;activeChatAnimal=null;currentSpeech='';userSpeech='';speechBar.classList.add('hidden');}
 });
+
+// Delete-mode: track hovered animal
+canvas.addEventListener('mousemove',e=>{
+  if(!deleteMode){if(hoveredDeleteAnimal){hoveredDeleteAnimal=null;}return;}
+  const rect=canvas.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)*(canvas.width/rect.width);
+  const my=(e.clientY-rect.top)*(canvas.height/rect.height);
+  const world=getActiveWorld();
+  hoveredDeleteAnimal=null;
+  if(world){for(const a of world.animals){if(Math.hypot(mx-a.x,my-a.y)<48){hoveredDeleteAnimal=a;break;}}}
+  canvas.style.cursor=hoveredDeleteAnimal?'pointer':'crosshair';
+});
+canvas.addEventListener('mouseleave',()=>{if(deleteMode)hoveredDeleteAnimal=null;});
 
 // ════════════════════════════════════════
 // CHAT
@@ -2172,6 +2229,21 @@ function selectEnv(id){
   });
 }
 selectEnv(activeEnv);
+
+// ── Panel action buttons ──
+document.getElementById('clear-all-btn').addEventListener('click',()=>{
+  // Clear animals from the world matching the panel's active environment
+  const target=worlds.find(w=>w.envId===activeEnv);
+  if(!target||target.animals.length===0)return;
+  if(!confirm(`Clear all animals from the ${environments.find(e=>e.id===activeEnv)?.label||activeEnv} world?`))return;
+  // Reset chat if any of those animals was active
+  if(activeChatAnimal&&target.animals.some(a=>a.id===activeChatAnimal.id)){
+    activeChatAnimal.chatting=false;activeChatAnimal=null;
+    currentSpeech='';userSpeech='';speechBar.classList.add('hidden');
+  }
+  target.animals=[];
+});
+document.getElementById('delete-mode-btn').addEventListener('click',()=>setDeleteMode(!deleteMode));
 
 const panel=document.getElementById('panel');
 const toggleBtn=document.getElementById('toggle-btn');
