@@ -84,6 +84,11 @@
     #drop-hint { position: absolute; inset: 0; pointer-events: none; z-index: 5; border: 3px dashed #4a9e6b; opacity: 0; transition: opacity 0.15s; background: rgba(74,158,107,0.04); display: flex; align-items: center; justify-content: center; }
     #drop-hint.active { opacity: 1; }
     #drop-hint span { font-size: 16px; color: #4a9e6b; font-weight: 600; background: rgba(255,255,255,0.9); padding: 8px 16px; border-radius: 20px; }
+    #spawn-limit-msg{position:absolute;top:22px;left:50%;transform:translateX(-50%);background:#fff1f1;color:#b91c1c;border:2px solid #fca5a5;border-radius:12px;padding:10px 24px;font-size:14px;font-weight:700;z-index:30;white-space:nowrap;pointer-events:none;display:none;box-shadow:0 4px 18px rgba(185,28,28,0.13);}
+    #char-warning{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:#fff1f1;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:20px;padding:6px 18px;font-size:13px;font-weight:700;z-index:30;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.2s;box-shadow:0 2px 12px rgba(185,28,28,0.10);}
+    #char-warning.show{opacity:1;}
+    #char-count{font-size:11px;color:#bbb;flex-shrink:0;font-weight:600;min-width:42px;text-align:right;transition:color 0.15s;}
+    #char-count.at-limit{color:#b91c1c;}
   </style>
 </head>
 <body>
@@ -91,6 +96,8 @@
   <div id="game-area">
     <canvas id="canvas"></canvas>
     <div id="drop-hint"><span>Drop animal here!</span></div>
+    <div id="spawn-limit-msg">⚠ Biome is full! Maximum 12 animals per world.</div>
+    <div id="char-warning">⚠ You've reached the 100 character limit!</div>
     <div id="loading-overlay" class="hidden">
       <span id="loading-emoji"></span>
       <div id="loading-text"></div>
@@ -99,7 +106,8 @@
     </div>
     <div id="speech-bar" class="hidden">
       <button id="close-chat-btn" title="Stop chatting">✕</button>
-      <input id="chat-input" type="text" placeholder="Say something..." maxlength="45" />
+      <input id="chat-input" type="text" placeholder="Say something..." />
+      <span id="char-count">0/100</span>
       <button id="chat-send">&#x279C;</button>
     </div>
   </div>
@@ -1972,7 +1980,7 @@ gameArea.addEventListener('drop',e=>{
   }
 
   // Max 12 animals per world
-  if(world.animals.length>=12){dragPayload=null;return;}
+  if(world.animals.length>=12){dragPayload=null;showSpawnLimit();return;}
 
   let mt=getMoveType(dragPayload.name);
   if(world.envId==='farm')mt='walk';
@@ -2083,6 +2091,55 @@ const chatInput=document.getElementById('chat-input');
 const chatSend=document.getElementById('chat-send');
 const closeChatBtn=document.getElementById('close-chat-btn');
 let conversations={},isSending=false;
+
+// ── Spawn limit warning ──
+let spawnLimitTimer;
+function showSpawnLimit(){
+  const msg=document.getElementById('spawn-limit-msg');
+  msg.style.display='block';
+  clearTimeout(spawnLimitTimer);
+  spawnLimitTimer=setTimeout(()=>msg.style.display='none',2500);
+}
+
+// ── Char limit warning ──
+const charCountEl=document.getElementById('char-count');
+const charWarningEl=document.getElementById('char-warning');
+let charWarningTimer;
+function showCharWarning(){
+  charWarningEl.classList.add('show');
+  clearTimeout(charWarningTimer);
+  charWarningTimer=setTimeout(()=>charWarningEl.classList.remove('show'),2000);
+}
+function hideCharWarning(){
+  charWarningEl.classList.remove('show');
+  clearTimeout(charWarningTimer);
+}
+function updateCharCount(n){
+  charCountEl.textContent=n+'/100';
+  charCountEl.classList.toggle('at-limit',n>=100);
+}
+
+// ── Input handler (100 non-space char limit) ──
+document.getElementById('chat-input').addEventListener('input',function(){
+  const val=chatInput.value;
+  const noSpaces=val.replace(/ /g,'');
+  if(noSpaces.length>100){
+    let kept=0,result='';
+    for(const ch of val){
+      if(ch===' '){result+=ch;}
+      else{kept++;if(kept<=100)result+=ch;}
+    }
+    chatInput.value=result;
+    showCharWarning();
+    updateCharCount(100);
+  } else if(noSpaces.length===100){
+    showCharWarning();
+    updateCharCount(100);
+  } else {
+    hideCharWarning();
+    updateCharCount(noSpaces.length);
+  }
+});
 
 function buildSystemPrompt(animal){
   return`You are a ${animal.name} living in the ${animal.envLabel}. Speak in first person, in character, as this animal would — knowledgeable about your own species, habitat, and behaviors.
