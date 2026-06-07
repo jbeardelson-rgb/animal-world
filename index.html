@@ -89,6 +89,22 @@
     #char-warning.show{opacity:1;}
     #char-count{font-size:11px;color:#bbb;flex-shrink:0;font-weight:600;min-width:42px;text-align:right;transition:color 0.15s;}
     #char-count.at-limit{color:#b91c1c;}
+    /* ── Settings ── */
+    #settings-btn{position:absolute;top:12px;left:12px;width:42px;height:42px;background:rgba(0,0,0,0.52);border:none;border-radius:13px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:25;backdrop-filter:blur(4px);transition:background 0.15s,transform 0.2s;box-shadow:0 2px 12px rgba(0,0,0,0.22);}
+    #settings-btn:hover{background:rgba(0,0,0,0.78);transform:rotate(30deg);}
+    #settings-panel{position:absolute;top:62px;left:12px;background:rgba(255,255,255,0.97);border:1px solid #e0e0dc;border-radius:18px;padding:18px 20px;z-index:25;width:260px;box-shadow:0 8px 36px rgba(0,0,0,0.16);display:flex;flex-direction:column;gap:14px;}
+    #settings-panel.hidden{display:none;}
+    .stg-title{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.07em;}
+    .stg-row{display:flex;align-items:center;gap:9px;}
+    .stg-slider{flex:1;-webkit-appearance:none;height:5px;border-radius:3px;background:#e8e8e4;outline:none;cursor:pointer;}
+    .stg-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#4a9e6b;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,0.22);}
+    .stg-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#4a9e6b;border:none;cursor:pointer;}
+    .stg-val{font-size:12px;color:#888;min-width:38px;text-align:right;font-weight:700;}
+    #speed-val{font-size:18px;font-weight:800;color:#4a9e6b;text-align:center;letter-spacing:-.01em;}
+    #mute-btn{flex-shrink:0;background:#f3f4f6;border:1.5px solid #e0e0dc;border-radius:9px;padding:7px 13px;font-size:13px;cursor:pointer;font-weight:600;color:#555;transition:all 0.15s;white-space:nowrap;}
+    #mute-btn:hover{background:#eaeaea;}
+    #mute-btn.on{background:#edf7f1;border-color:#4a9e6b;color:#2e7d50;}
+    .stg-divider{height:1px;background:#f0f0ec;margin:2px 0;}
   </style>
 </head>
 <body>
@@ -96,6 +112,34 @@
   <div id="game-area">
     <canvas id="canvas"></canvas>
     <div id="drop-hint"><span>Drop animal here!</span></div>
+    <!-- Settings -->
+    <button id="settings-btn" title="Settings">⚙</button>
+    <div id="settings-panel" class="hidden">
+      <div class="stg-title">⚙ Settings</div>
+      <div class="stg-divider"></div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#444;margin-bottom:8px;">🐾 Animal Speed</div>
+        <div id="speed-val">1.0×</div>
+        <div class="stg-row" style="margin-top:6px;">
+          <span class="stg-val" style="min-width:28px;text-align:left;color:#bbb;">¼×</span>
+          <input type="range" class="stg-slider" id="speed-slider" min="0.25" max="3" step="0.05" value="1">
+          <span class="stg-val" style="color:#bbb;">3×</span>
+        </div>
+      </div>
+      <div class="stg-divider"></div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#444;margin-bottom:10px;">🔊 Ambient Sound</div>
+        <div class="stg-row" style="margin-bottom:10px;">
+          <button id="mute-btn">🔇 Off</button>
+          <span style="font-size:12px;color:#aaa;flex:1;text-align:right;">Click to enable</span>
+        </div>
+        <div class="stg-row">
+          <span style="font-size:15px;">🔈</span>
+          <input type="range" class="stg-slider" id="vol-slider" min="0" max="1" step="0.01" value="0.35">
+          <span class="stg-val" id="vol-label">35%</span>
+        </div>
+      </div>
+    </div>
     <div id="spawn-limit-msg">⚠ Biome is full! Maximum 12 animals per world.</div>
     <div id="char-warning">⚠ You've reached the 100 character limit!</div>
     <div id="loading-overlay" class="hidden">
@@ -134,6 +178,7 @@
 let worlds = [], activeWorldId = null, worldIdCounter = 0, animalIdCounter = 0, pendingNewWorld = null;
 const ENV_ICONS = { jungle:'🌿', ocean:'🌊', desert:'🏜️', arctic:'🧊', savanna:'🦁', forest:'🌲', farm:'🌾' };
 const TAB_H=40, TAB_W=90, TAB_GAP=6, TAB_MARGIN=12, NEW_BTN_W=46;
+let gameSpeed=1.0; // controlled by settings slider
 const BAD_WORDS=['fuck','shit','bitch','ass','damn','crap','bastard','dick','cock','pussy','cunt','piss','hell','wtf','stfu','idiot','stupid','hate','kill','die','ugly'];
 function hasBadWord(t){const l=t.toLowerCase();return BAD_WORDS.some(w=>new RegExp('\\b'+w+'\\b').test(l));}
 
@@ -283,29 +328,81 @@ function drawRoundRect(ctx,x,y,w,h,r){
   ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
   ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
-function drawBubble(text,ax,ay,isUser){
-  if(!text)return;
-  const pad=14,lh=22,maxW=230,r=14;
+// ── Bubble state ──
+let bubbleExpanded=false;
+let moreButtonRect=null; // {x,y,w,h} in canvas coords
+
+function drawBubble(text,ax,ay,isUser,stackAbove){
+  // stackAbove: optional {x,y,w,h} rect to stack this bubble above
+  // Returns the drawn bubble rect {x,y,w,h}
+  if(!text)return null;
+  const pad=13,lh=21,maxW=210,r=13;
+  const MAX_LINES=4;
   ctx.font='14px system-ui';
-  const lines=wrapText(ctx,text,maxW);
-  const bw=Math.max(...lines.map(l=>ctx.measureText(l).width))+pad*2;
-  const bh=lines.length*lh+pad*2;
-  const emojiR=34;
-  let bx=ax-bw/2,by=isUser?ay+emojiR+8:ay-emojiR-bh-8;
+  const allLines=wrapText(ctx,text,maxW);
+  const hasMore=!isUser&&allLines.length>MAX_LINES;
+  const showLines=(hasMore&&!bubbleExpanded)?allLines.slice(0,MAX_LINES):allLines;
+  const contentW=Math.max(...showLines.map(l=>ctx.measureText(l).width),50);
+  const bw=contentW+pad*2;
+  const moreBtnH=hasMore?26:0;
+  const bh=showLines.length*lh+pad*2+moreBtnH;
+
+  // Horizontal: prefer right of animal, flip left if no room
+  const GAP=62;
+  let bx=ax+GAP,tailSide='left';
+  if(bx+bw>canvas.width-10){bx=ax-GAP-bw;tailSide='right';}
   bx=Math.max(8,Math.min(canvas.width-bw-8,bx));
-  by=Math.max(8,Math.min(canvas.height-bh-8,by));
-  const tailX=Math.max(bx+20,Math.min(bx+bw-20,ax));
-  ctx.shadowColor='rgba(0,0,0,0.10)';ctx.shadowBlur=10;ctx.shadowOffsetY=3;
+
+  // Vertical: stack above given rect, or center on animal
+  let by;
+  if(stackAbove){by=stackAbove.y-bh-8;}
+  else{by=ay-bh/2;}
+  by=Math.max(8,Math.min(canvas.height-bh-80,by)); // 80px bottom clearance for tabs
+
+  // ── Background + shadow ──
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.13)';ctx.shadowBlur=14;ctx.shadowOffsetY=4;
   drawRoundRect(ctx,bx,by,bw,bh,r);
-  ctx.fillStyle=isUser?'#4a9e6b':'#ffffff';ctx.fill();
-  ctx.strokeStyle=isUser?'#3a8a5a':'#e0e0dc';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=isUser?'#4a9e6b':'#fff';ctx.fill();
   ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+  ctx.strokeStyle=isUser?'#3a8a5a':'#e0e0dc';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.restore();
+
+  // ── Horizontal tail ──
+  const tailY=Math.min(by+bh-r-8,Math.max(by+r+8,ay));
+  ctx.save();
   ctx.beginPath();
-  if(isUser){ctx.moveTo(tailX-8,by);ctx.lineTo(tailX,ay+emojiR+2);ctx.lineTo(tailX+8,by);}
-  else{ctx.moveTo(tailX-8,by+bh);ctx.lineTo(tailX,ay-emojiR-2);ctx.lineTo(tailX+8,by+bh);}
-  ctx.fillStyle=isUser?'#4a9e6b':'#ffffff';ctx.fill();
-  ctx.font='14px system-ui';ctx.fillStyle=isUser?'#fff':'#222';ctx.textAlign='left';ctx.textBaseline='top';
-  lines.forEach((l,i)=>ctx.fillText(l,bx+pad,by+pad+i*lh));
+  if(tailSide==='left'){
+    ctx.moveTo(bx,tailY-7);ctx.lineTo(bx-14,tailY);ctx.lineTo(bx,tailY+7);
+  }else{
+    ctx.moveTo(bx+bw,tailY-7);ctx.lineTo(bx+bw+14,tailY);ctx.lineTo(bx+bw,tailY+7);
+  }
+  ctx.fillStyle=isUser?'#4a9e6b':'#fff';ctx.fill();
+  ctx.restore();
+
+  // ── Text ──
+  ctx.save();
+  ctx.font='14px system-ui';ctx.fillStyle=isUser?'#fff':'#222';
+  ctx.textAlign='left';ctx.textBaseline='top';
+  showLines.forEach((l,i)=>ctx.fillText(l,bx+pad,by+pad+i*lh));
+
+  // ── Expand/collapse button ──
+  if(hasMore){
+    const btnLabel=bubbleExpanded?'▲ less':'… ▼ more';
+    ctx.font='bold 11px system-ui';
+    const btnW=ctx.measureText(btnLabel).width+16;
+    const btnH=19;
+    const btnX=bx+bw-btnW-8;
+    const btnY=by+bh-btnH-6;
+    drawRoundRect(ctx,btnX,btnY,btnW,btnH,9);
+    ctx.fillStyle='rgba(74,158,107,0.13)';ctx.fill();
+    ctx.fillStyle='#4a9e6b';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(btnLabel,btnX+btnW/2,btnY+btnH/2);
+    moreButtonRect={x:btnX,y:btnY,w:btnW,h:btnH};
+  }else if(!hasMore&&!isUser){moreButtonRect=null;}
+  ctx.restore();
+
+  return{x:bx,y:by,w:bw,h:bh};
 }
 
 // ════════════════════════════════════════
@@ -1467,8 +1564,8 @@ function drawAnimalShape(a,isActive){
     }
   }finally{ctx.restore();}
   if(isActive){
-    if(userSpeech)drawBubble(userSpeech,a.x,a.y,true);
-    if(currentSpeech)drawBubble(currentSpeech,a.x,a.y,false);
+    const aiRect=currentSpeech?drawBubble(currentSpeech,a.x,a.y,false,null):null;
+    if(userSpeech)drawBubble(userSpeech,a.x,a.y,true,aiRect);
   }
 }
 // ════════════════════════════════════════
@@ -1809,8 +1906,8 @@ function updateAnimals(world){
 
   world.animals.forEach(a=>{
     if(a.chatting)return;
-    a.phase+=0.025;
-    a.x+=a.vx;
+    a.phase+=0.025*gameSpeed;
+    a.x+=a.vx*gameSpeed;
 
     // Pen boundaries for farm animals
     if(world.envId==='farm'){
@@ -2018,6 +2115,12 @@ canvas.addEventListener('click',e=>{
   const my=(e.clientY-rect.top)*(canvas.height/rect.height);
   const ch=canvas.height,tabY=ch-TAB_H-TAB_MARGIN;
 
+  // ── "… more" expand button ──
+  if(moreButtonRect){
+    const b=moreButtonRect;
+    if(mx>=b.x&&mx<=b.x+b.w&&my>=b.y&&my<=b.y+b.h){bubbleExpanded=!bubbleExpanded;return;}
+  }
+
   // ── Trash button check (circle overlaps tab corner — checked before tabY gate) ──
   for(let i=0;i<worlds.length;i++){
     const tx=TAB_MARGIN+i*(TAB_W+TAB_GAP),ty=tabY;
@@ -2141,6 +2244,84 @@ document.getElementById('chat-input').addEventListener('input',function(){
   }
 });
 
+// ════════════════════════════════════════
+// AUDIO SYSTEM
+// ════════════════════════════════════════
+let audioCtx=null,masterGain=null,audioMuted=true,audioVolume=0.35;
+
+function ensureAudio(){
+  if(audioCtx)return;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  masterGain=audioCtx.createGain();
+  masterGain.gain.value=audioMuted?0:audioVolume;
+  masterGain.connect(audioCtx.destination);
+  // Pink-noise ambient background
+  const sr=audioCtx.sampleRate;
+  const buf=audioCtx.createBuffer(2,sr*4,sr);
+  for(let c=0;c<2;c++){
+    const d=buf.getChannelData(c);
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i=0;i<d.length;i++){
+      const w=Math.random()*2-1;
+      b0=.99886*b0+w*.0555179;b1=.99332*b1+w*.0750759;b2=.9690*b2+w*.153852;
+      b3=.8665*b3+w*.3104856;b4=.5500*b4+w*.5329522;b5=-.7616*b5-w*.016898;
+      d[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.09;b6=w*.115926;
+    }
+  }
+  const src=audioCtx.createBufferSource();src.buffer=buf;src.loop=true;
+  const lp=audioCtx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=700;lp.Q.value=.5;
+  src.connect(lp);lp.connect(masterGain);src.start();
+}
+
+function setAudioMuted(muted){
+  audioMuted=muted;
+  if(!audioCtx){if(!muted)ensureAudio();return;}
+  masterGain.gain.setTargetAtTime(muted?0:audioVolume,audioCtx.currentTime,.4);
+}
+function setAudioVolume(vol){
+  audioVolume=vol;
+  if(audioCtx&&!audioMuted)masterGain.gain.setTargetAtTime(vol,audioCtx.currentTime,.1);
+}
+
+// ════════════════════════════════════════
+// SETTINGS PANEL
+// ════════════════════════════════════════
+const settingsBtn=document.getElementById('settings-btn');
+const settingsPanel=document.getElementById('settings-panel');
+settingsBtn.addEventListener('click',e=>{e.stopPropagation();settingsPanel.classList.toggle('hidden');});
+document.addEventListener('click',e=>{if(!settingsPanel.classList.contains('hidden')&&!settingsPanel.contains(e.target)&&e.target!==settingsBtn){settingsPanel.classList.add('hidden');}});
+
+// Speed slider
+const speedSlider=document.getElementById('speed-slider');
+const speedVal=document.getElementById('speed-val');
+speedSlider.addEventListener('input',()=>{
+  gameSpeed=parseFloat(speedSlider.value);
+  const s=gameSpeed.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+  speedVal.textContent=s+'×';
+  speedVal.style.color=gameSpeed<.7?'#3b82f6':gameSpeed>1.5?'#f97316':'#4a9e6b';
+});
+
+// Mute toggle
+const muteBtn=document.getElementById('mute-btn');
+const volStatusTxt=muteBtn.nextElementSibling;
+muteBtn.addEventListener('click',()=>{
+  audioMuted=!audioMuted;
+  setAudioMuted(audioMuted);
+  muteBtn.textContent=audioMuted?'🔇 Off':'🔊 On';
+  muteBtn.classList.toggle('on',!audioMuted);
+  if(volStatusTxt)volStatusTxt.textContent=audioMuted?'Click to enable':'Playing';
+});
+
+// Volume slider
+const volSlider=document.getElementById('vol-slider');
+const volLabel=document.getElementById('vol-label');
+volSlider.addEventListener('input',()=>{
+  const vol=parseFloat(volSlider.value);
+  setAudioVolume(vol);
+  volLabel.textContent=Math.round(vol*100)+'%';
+  if(audioMuted){audioMuted=false;setAudioMuted(false);muteBtn.textContent='🔊 On';muteBtn.classList.add('on');if(volStatusTxt)volStatusTxt.textContent='Playing';}
+});
+
 function buildSystemPrompt(animal){
   return`You are a ${animal.name} living in the ${animal.envLabel}. Speak in first person, in character, as this animal would — knowledgeable about your own species, habitat, and behaviors.
 
@@ -2160,6 +2341,7 @@ STRICT RULES — no exceptions, every response:
 }
 
 async function openChat(animal){
+  bubbleExpanded=false;moreButtonRect=null;
   activeChatAnimal=animal;animal.chatting=true;
   loadingEmoji.textContent=animal.emoji;
   loadingText.textContent=`Waking up ${animal.name}...`;
@@ -2178,7 +2360,8 @@ function showChatUI(animal){speechBar.classList.remove('hidden');chatInput.focus
 async function sendMessage(){
   if(!activeChatAnimal||isSending)return;
   const text=chatInput.value.trim();if(!text)return;
-  chatInput.value='';isSending=true;chatSend.disabled=true;
+  chatInput.value='';updateCharCount(0);isSending=true;chatSend.disabled=true;
+  bubbleExpanded=false;moreButtonRect=null;
   userSpeech=hasBadWord(text)?'[message filtered]':text;
   const userContent=hasBadWord(text)?'[message filtered]':text;
   conversations[activeChatAnimal.id].push({role:'user',content:userContent});
@@ -2200,7 +2383,7 @@ async function callAPI(animal,messages){
 
 chatSend.addEventListener('click',sendMessage);
 chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
-closeChatBtn.addEventListener('click',()=>{if(activeChatAnimal){activeChatAnimal.chatting=false;activeChatAnimal=null;}currentSpeech='';userSpeech='';speechBar.classList.add('hidden');});
+closeChatBtn.addEventListener('click',()=>{if(activeChatAnimal){activeChatAnimal.chatting=false;activeChatAnimal=null;}currentSpeech='';userSpeech='';bubbleExpanded=false;moreButtonRect=null;speechBar.classList.add('hidden');});
 
 // ════════════════════════════════════════
 // PANEL DATA
